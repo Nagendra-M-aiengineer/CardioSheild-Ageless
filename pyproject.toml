@@ -1,0 +1,8 @@
+[project]
+requires-python = ">=3.14"
+
+[tool.vercel]
+entrypoint = "server.py"
+
+[tool.vercel.scripts]
+build = "python build.py"

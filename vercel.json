@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "server.py": {
+      "includeFiles": [
+        "model/cardio_model.pkl",
+        "datasets/cardioshield_preprocessed.csv"
+      ],
+      "maxDuration": 60
+    }
+  }
+}

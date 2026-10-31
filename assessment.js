@@ -5,7 +5,7 @@
 // CARDIOSHIELD-AGELESS ASSESSMENT
 // ============================================
 
-const API_URL = "http://127.0.0.1:5000/predict";
+const API_URL = "/predict";
 const RESULT_KEY = "cardioResult";
 const ASSESSMENT_KEY = "cardioAssessment";
 const LEGACY_ASSESSMENT_KEY = "cardioShieldData";
