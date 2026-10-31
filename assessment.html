@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heart Health Assessment | CardioShield-AgeLess</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+:root {
+    --navy: #102f43;
+    --navy2: #17475a;
+    --teal: #087f8c;
+    --aqua: #45c8b5;
+    --pale: #eaf8f6;
+    --bg: #f4f9fa;
+    --white: #fff;
+    --text: #203b4b;
+    --muted: #708591;
+    --border: #dce9ec;
+    --shadow: 0 18px 50px rgba(16,47,67,.08);
+    --radius: 20px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    background:
+        radial-gradient(ellipse at 10% 10%, rgba(69,200,181,.10), transparent 32%),
+        radial-gradient(ellipse at 95% 25%, rgba(8,127,140,.07), transparent 28%),
+        var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+    line-height: 1.6;
+}
+
+a {
+    color: var(--teal);
+    text-decoration: none;
+    font-weight: 650;
+}
+
+a:hover { color: var(--navy); }
+
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+
+.site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 17px max(5%, calc((100% - 1180px)/2));
+    background: rgba(255,255,255,.95);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: blur(16px);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--navy);
+    font-weight: 850;
+    font-size: 19px;
+    letter-spacing: -.5px;
+}
+
+.brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background: linear-gradient(145deg, var(--teal), var(--navy));
+    color: white;
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+    box-shadow: 0 8px 18px #087f8c30;
+}
+
+.nav-links {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.nav-links a {
+    font-size: 14px;
+    color: #496271;
+}
+
+.nav-links a.active { color: var(--teal); }
+
+.nav-cta {
+    background: var(--navy);
+    color: white !important;
+    padding: 10px 16px;
+    border-radius: 12px;
+}
+
+.hero {
+    background: linear-gradient(120deg, #102f43, #125969 60%, #087f8c);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    padding: 48px 22px 66px;
+}
+
+.hero-inner {
+    max-width: 1120px;
+    margin: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.eyebrow {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #8ee5d8;
+}
+
+.hero h1 {
+    font-size: clamp(30px, 4vw, 46px);
+    line-height: 1.12;
+    letter-spacing: -1.5px;
+    margin: 12px 0;
+}
+
+.hero p {
+    max-width: 680px;
+    color: #d5e8ed;
+    margin: 0;
+    font-size: 16px;
+}
+
+.hero-meta {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 23px;
+}
+
+.pill {
+    border: 1px solid #ffffff30;
+    background: #ffffff0c;
+    padding: 7px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    color: #e9f8f7;
+}
+
+.container {
+    max-width: 1120px;
+    width: 92%;
+    margin: -28px auto 50px;
+    position: relative;
+    z-index: 2;
+}
+
+.notice {
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    background: #fff9ec;
+    border: 1px solid #f1dfb9;
+    border-radius: 15px;
+    padding: 17px 19px;
+    margin-bottom: 20px;
+    color: #73501a;
+    font-size: 13px;
+}
+
+.notice-icon { font-size: 21px; }
+
+.panel, .section, .progress-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 25px;
+    margin-bottom: 20px;
+    min-width: 0;
+}
+
+.section {
+    scroll-margin-top: 95px;
+    transition: border-color .2s;
+}
+
+.section:hover { border-color: #c9e2e3; }
+
+.section-heading {
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    margin-bottom: 22px;
+}
+
+.step-number {
+    flex: 0 0 39px;
+    height: 39px;
+    border-radius: 13px;
+    background: var(--pale);
+    color: var(--teal);
+    display: grid;
+    place-items: center;
+    font-weight: 850;
+    font-size: 14px;
+}
+
+.section h2 {
+    font-size: 19px;
+    color: var(--navy);
+    letter-spacing: -.4px;
+    margin: 0 0 3px;
+}
+
+.section-heading p, .hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0;
+    line-height: 1.65;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 22px;
+}
+
+.field { min-width: 0; }
+
+.field label {
+    display: block;
+    color: #294554;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+input:not([type=file]), select {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 13px;
+    background: #fbfdfd;
+    color: var(--text);
+    border: 1px solid #d6e3e6;
+    border-radius: 11px;
+    outline: none;
+    transition: .2s;
+}
+
+input:focus, select:focus {
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px #087f8c17;
+    background: white;
+}
+
+input::placeholder { color: #9aabb3; }
+
+input[readonly] {
+    background: #f1f7f7;
+    color: #58717e;
+}
+
+.field-help {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 6px 0 0;
+}
+
+.conditional {
+    display: none;
+    background: #f3fbfa;
+    border: 1px solid #d9eeeb;
+    border-radius: 14px;
+    padding: 17px;
+    margin-top: 14px;
+}
+
+.conditional.show { display: block; }
+
+.profile-top {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 15px;
+}
+
+.profile-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: var(--pale);
+    display: grid;
+    place-items: center;
+    font-size: 22px;
+}
+
+.profile-status {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 10px;
+}
+
+.profile-link {
+    display: inline-block;
+    margin-top: 13px;
+    font-size: 13px;
+}
+
+.report-drop {
+    border: 1.5px dashed #b7d6d7;
+    border-radius: 15px;
+    background: #f7fcfb;
+    padding: 20px;
+}
+
+.report-drop input[type=file] {
+    width: 100%;
+    margin: 8px 0 15px;
+    font-size: 13px;
+}
+
+.button {
+    border: 0;
+    border-radius: 12px;
+    padding: 12px 17px;
+    font-size: 13px;
+    font-weight: 750;
+    transition: transform .18s, box-shadow .18s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.button:hover { transform: translateY(-1px); }
+
+.button:disabled {
+    opacity: .6;
+    cursor: wait;
+    transform: none;
+}
+
+.button-primary {
+    background: linear-gradient(120deg, var(--teal), #076674);
+    color: white;
+    box-shadow: 0 7px 18px #087f8c24;
+}
+
+.button-primary:hover { box-shadow: 0 10px 22px #087f8c35; }
+
+.button-secondary {
+    background: #edf6f6;
+    color: var(--navy);
+    border: 1px solid #d9e8e9;
+}
+
+.button-small { padding: 9px 13px; }
+
+.progress-card {
+    padding: 20px 24px;
+    position: sticky;
+    top: 78px;
+    z-index: 10;
+}
+
+.progress-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 11px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--navy);
+}
+
+.progress-track {
+    height: 8px;
+    background: #e8f0f1;
+    border-radius: 100px;
+    overflow: hidden;
+}
+
+#progressFill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--teal), var(--aqua));
+    border-radius: 100px;
+    transition: width .3s;
+}
+
+.progress-note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 8px;
+}
+
+.review-box {
+    margin-top: 18px;
+    padding: 17px;
+    background: #f6fbfa;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.review-box h3 {
+    margin: 0 0 5px;
+    font-size: 15px;
+    color: var(--navy);
+}
+
+#reportPreview {
+    padding-left: 22px;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+#reportPreview li { padding: 3px 0; }
+
+.imported-field {
+    border-color: var(--teal) !important;
+    background: #edfaf7 !important;
+}
+
+.status-message {
+    display: none;
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-top: 15px;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.status-message.show { display: block; }
+
+.status-message.error {
+    background: #fff0ef;
+    border: 1px solid #f3c7c3;
+    color: #a22e26;
+}
+
+.status-message.success {
+    background: #effaf4;
+    border: 1px solid #c9ead5;
+    color: #21633b;
+}
+
+.submit-panel { text-align: center; padding: 28px; }
+
+.submit-panel h2 {
+    margin: 0 0 8px;
+    color: var(--navy);
+    font-size: 22px;
+}
+
+.submit-panel p {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0 auto 20px;
+    max-width: 600px;
+}
+
+.submit-btn {
+    width: 100%;
+    max-width: 440px;
+    padding: 16px;
+    font-size: 15px;
+}
+
+.disclaimer {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-top: 16px;
+}
+
+footer {
+    text-align: center;
+    padding: 27px 18px;
+    color: #78909b;
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    background: white;
+}
+
+[hidden] { display: none !important; }
+
+@media(max-width:760px) {
+    .site-header {
+        padding: 12px 4%;
+        flex-wrap: wrap;
+    }
+
+    .brand { font-size: 16px; }
+    .brand-mark { width: 37px; height: 37px; }
+
+    .nav-links {
+        width: 100%;
+        gap: 16px;
+        overflow-x: auto;
+        padding: 4px 0;
+    }
+
+    .nav-links a {
+        white-space: nowrap;
+        font-size: 12px;
+    }
+
+    .hero { padding: 36px 5% 54px; }
+    .container { width: 94%; }
+
+    .panel, .section, .progress-card {
+        padding: 19px;
+        border-radius: 16px;
+    }
+
+    .progress-card { top: 106px; }
+}
+
+@media(max-width:560px) {
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .hero h1 { font-size: 31px; }
+    .section h2 { font-size: 17px; }
+    .section-heading { gap: 10px; }
+    .notice { padding: 14px; }
+    .report-drop { padding: 15px; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+    *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation: none !important;
+        transition: none !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+    <a class="brand" href="index.html">
+        <span class="brand-mark">♥</span>
+        <span>CardioShield<span style="color:var(--teal)">·</span>AgeLess</span>
+    </a>
+
+    <nav class="nav-links" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="profile.html">User Profile</a>
+        <a class="active" href="assessment.html">Assessment</a>
+        <a class="nav-cta" href="dashboard.html">Dashboard ↗</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <div class="hero-inner">
+        <div class="eyebrow">Preventive health awareness</div>
+        <h1>Your heart health,<br>one step at a time.</h1>
+        <p>Complete your lifestyle information and enter clinical measurements from your medical records where available. Review all information before submitting.</p>
+
+        <div class="hero-meta">
+            <span class="pill">◷ About 5–8 minutes</span>
+            <span class="pill">▣ 12 assessment sections</span>
+            <span class="pill">⌁ Educational screening prototype</span>
+        </div>
+    </div>
+</section>
+
+<main class="container">
+
+    <div class="notice">
+        <span class="notice-icon">ⓘ</span>
+        <div>
+            <strong>Important health information</strong><br>
+            This is an educational screening prototype, not a medical diagnosis. Do not guess clinical test values. If you experience chest pain, severe breathlessness, or other possible emergency symptoms, seek urgent medical help instead of relying on this application.
+        </div>
+    </div>
+
+    <section class="panel" aria-labelledby="profileTitle">
+        <div class="profile-top">
+            <div class="profile-icon">♙</div>
+            <div>
+                <h2 id="profileTitle" style="margin:0;color:var(--navy);font-size:19px">Your saved profile</h2>
+                <p class="hint">Saved information can help fill in your assessment.</p>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="field">
+                <label for="profileName">Full name</label>
+                <input id="profileName" readonly placeholder="No saved name">
+            </div>
+            <div class="field">
+                <label for="profileAge">Age (years)</label>
+                <input id="profileAge" readonly placeholder="No saved age">
+            </div>
+        </div>
+
+        <p id="profileStatus" class="profile-status" aria-live="polite"></p>
+        <a class="profile-link" href="profile.html">Edit user profile →</a>
+    </section>
+
+    <section class="panel" aria-labelledby="reportTitle">
+        <div class="profile-top">
+            <div class="profile-icon">▤</div>
+            <div>
+                <h2 id="reportTitle" style="margin:0;color:var(--navy);font-size:19px">Import a medical report</h2>
+                <p class="hint">Read supported values from a text-based PDF or TXT file.</p>
+            </div>
+        </div>
+
+        <div class="report-drop">
+            <p class="hint">Choose a report up to 10 MB. Scanned image-only PDFs are not supported. Extracted values will be shown for review before being applied.</p>
+
+            <div class="field">
+                <label for="medicalReport">Medical report (PDF or TXT)</label>
+                <input type="file" id="medicalReport" accept=".pdf,.txt,application/pdf,text/plain">
+            </div>
+
+            <button class="button button-primary" type="button" id="extractReportButton">Read report &amp; find values →</button>
+            <p id="reportStatus" class="profile-status" role="status" aria-live="polite"></p>
+
+            <div id="reportReview" class="review-box" hidden>
+                <h3>Values found in your report</h3>
+                <p class="hint">Verify every value against the original document before applying it.</p>
+                <ul id="reportPreview"></ul>
+                <button class="button button-secondary button-small" type="button" id="applyReportButton">Apply reviewed values</button>
+            </div>
+        </div>
+    </section>
+
+    <div class="progress-card">
+        <div class="progress-row">
+            <span>Assessment progress</span>
+            <span id="progressText">0%</span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-label="Assessment completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar">
+            <div id="progressFill"></div>
+        </div>
+        <div class="progress-note">Complete the required questions and review your answers before analysis.</div>
+    </div>
+
+    <form id="assessmentForm" novalidate>
+
+        <!-- SECTION 1 -->
+        <section class="section">
+            <div class="section-heading">
+                <span class="step-number">01</span>
+                <div>
+                    <h2>Personal information</h2>
+                    <p>Basic information used by the prediction model.</p>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="field">
+                    <label for="age">Age (years) *</label>
+                    <input id="age" type="number" min="1" max="120" required placeholder="Enter age">
+                </div>
+
+                <div class="field">
+                    <label for="sex">Sex *</label>
+                    <select id="sex" required>
+                        <option value="">Select an option</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="prefer_not_to_say">Prefer not to say</option>
+                    </select>
+                    <p class="field-help">The model expects binary sex encoding. “Prefer not to say” is sent as unavailable.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2 -->
+        <section class="section">
+            <div class="section-heading">
+                <span class="step-number">02</span>
+                <div>
+                    <h2>Blood pressure</h2>
+                    <p>Use a recent measured reading if available.</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="hasBP">Do you have a recent blood pressure measurement? *</label>
+                <select id="hasBP" required>
+                    <option value="">Select an option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <div class="conditional" id="bpGroup">
+                <div class="grid">
+                    <div class="field">
+                        <label for="systolicBP">Systolic pressure (mmHg)</label>
+                        <input id="systolicBP" type="number" min="50" max="300" placeholder="e.g. 120">
+                    </div>
+                    <div class="field">
+                        <label for="diastolicBP">Diastolic pressure (mmHg)</label>
+                        <input id="diastolicBP" type="number" min="30" max="200" placeholder="e.g. 80">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3 -->
+        <section class="section">
+            <div class="section-heading">
+                <span class="step-number">03</span>
+                <div>
+                    <h2>Smoking</h2>
+                    <p>Report your current smoking status honestly.</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="hasSmokingInfo">Do you currently smoke? *</label>
+                <select id="hasSmokingInfo" required>
+                    <option value="">Select an option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <div class="conditional" id="smokingGroup">
+                <div class="field">
+                    <label for="cigsPerDay">Cigarettes per day</label>
+                    <input id="cigsPerDay" type="number" min="0" max="200" placeholder="Enter number">
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4 -->
+        <section class="section">
+            <div class="section-heading">
+                <span class="step-number">04</span>
+                <div>
+                    <h2>Physical activity</h2>
+                    <p>Choose the level that best describes your usual routine.</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="hasPhysicalActivityInfo">Can you provide your physical activity information? *</label>
+                <select id="hasPhysicalActivityInfo" required>
+                    <option value="">Select an option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <div class="conditional" id="activityGroup">
+                <div class="field">
+                    <label for="exercise">Usual physical activity level</label>
+                    <select id="exercise">
+                        <option value="">Select an option</option>
+                        <option value="low">Low</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5 -->
+        <section class="section">
+            <div class="section-heading">
+                <span class="step-number">05</span>
+                <div>
+                    <h2>Sleep</h2>
+                    <p>Average sleep duration per night.</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="sleep">How much do you usually sleep? *</label>
+                <select id="sleep" required>
+                    <option value="">Select an option</option>
+                    <option value="less_than_5">Less than 5 hours</option>
+                    <option value="5_to_6">5–6 hours</option>
+                    <option value="7_to_8">7–8 hours</option>
+                    <option value="more_than_8">More than 8 hours</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- SECTION 6 -->
+        <section class="section">
+            <div class="section-heading">
+                <span class="step-number">06</span>
+                <div>
+                    <h2>Stress</h2>
+                    <p>Estimate your usual stress level.</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="hasStressInfo">Can you estimate your stress level? *</label>
+                <select id="hasStressInfo" required>
+                    <option value="">Select an option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <div class="conditional" id="stressGroup">
+                <div class="field">
+                    <label for="stress">Usual stress level</label>
+                    <select id="stress">
+                        <option value="">Select an option</option>
+                        <option value="low">Low</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7 -->
+        <section class="section">
+            <div class="section-heading">
+                <span class="step-number">07</span>
+                <div>
+                    <h2>Alcohol consumption</h2>
+                    <p>Choose the option that describes your consumption.</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="hasAlcoholInfo">Can you provide your alcohol consumption information? *</label>
+                <select id="hasAlcoholInfo" required>
+                    <option value="">Select an option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <div class="conditional" id="alcoholGroup">
+                <div class="field">
+                    <label for="alcohol">Usual alcohol consumption</label>
+                    <select id="alcohol">
+                        <option value="">Select an option</option>
+                        <option value="never">Never</option>
+                        <option value="occasional">Occasionally</option>
+                        <option value="frequent">Frequently</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 8 -->
+        <section class="section">
+            <div class="section-heading">
+                <span class="step-number">08</span>
+                <div>
+                    <h2>Diet quality</h2>
+                    <p>Describe your usual eating pattern.</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="hasDietInfo">Can you describe your usual diet? *</label>
+                <select id="hasDietInfo" required>
+                    <option value="">Select an option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <div class="conditional" id="dietGroup">
+                <div class="field">
+                    <label for="diet">Usual diet quality</label>
+                    <select id="diet">
+                        <option value="">Select an option</option>
+                        <option value="healthy">Mostly balanced</option>
+                        <option value="moderate">Mixed diet</option>
+                        <option value="poor">Poor diet quality</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 9 -->
+        <section class="section">
+            <div class="section-heading">
+                <span class="step-number">09</span>
+                <div>
+                    <h2>Junk food</h2>
+                    <p>Estimate how often you eat highly processed or fast foods.</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="hasJunkFoodInfo">Can you report your junk-food frequency? *</label>
+                <select id="hasJunkFoodInfo" required>
+                    <option value="">Select an option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <div class="conditional" id="junkGroup">
+                <div class="field">
+                    <label for="junkFood">How often do you eat junk food?</label>
+                    <select id="junkFood">
+                        <option value="">Select an option</option>
+                        <option value="rarely">Rarely</option>
+                        <option value="sometimes">Sometimes</option>
+                        <option value="often">Often</option>
+                        <option value="daily">Daily</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 10 -->
+        <section class="section">
+            <div class="section-heading">
+                <span class="step-number">10</span>
+                <div>
+                    <h2>Family history</h2>
+                    <p>Family history may provide useful context for health awareness.</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="hasFamilyHistoryInfo">Do you know your family history of heart disease? *</label>
+                <select id="hasFamilyHistoryInfo" required>
+                    <option value="">Select an option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+
+            <div class="conditional" id="familyGroup">
+                <div class="field">
+                    <label for="familyHistory">Family history of heart disease</label>
+                    <select id="familyHistory">
+                        <option value="">Select an option</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 11 -->
+        <section class="section">
+            <div class="section-heading">
+                <span class="step-number">11</span>
+                <div>
+                    <h2>Screen time</h2>
+                    <p>Estimate your usual daily screen time.</p>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="screenTime">Daily screen time *</label>
+                <select id="screenTime" required>
+                    <option value="">Select an option</option>
+                    <option value="less_than_2">Less than 2 hours</option>
+                    <option value="2_to_4">2–4 hours</option>
+                    <option value="4_to_6">4–6 hours</option>
+                    <option value="more_than_6">More than 6 hours</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- SECTION 12 -->
+        <section class="section">
+            <div class="section-heading">
+                <span class="step-number">12</span>
+                <div>
+                    <h2>Clinical measurements</h2>
+                    <p>Only enter values from actual medical records or test results.</p>
+                </div>
+            </div>
+
+            <div class="notice" style="margin-bottom:20px">
+                <span class="notice-icon">ⓘ</span>
+                <div>
+                    Leave unavailable measurements blank. Do not guess ECG or stress-test values.
+                    Missing values are only supported if your saved model preprocessing handles them.
+                    Confirm that the coding matches your trained model.
+                </div>
+            </div>
+
+            <div class="field" style="margin-bottom:18px">
+                <label for="chest_pain_type">Chest pain type (if assessed)</label>
+                <select id="chest_pain_type">
+                    <option value="">Not sure / Not tested</option>
+                    <option value="1">Typical angina (usual heart-related chest pain)</option>
+                    <option value="2">Atypical angina (unusual heart-related chest pain)</option>
+                    <option value="3">Non-anginal pain (not typical of angina)</option>
+                    <option value="4">Asymptomatic (no symptoms)</option>
+                </select>
+                <p class="field-help">
+                    Choose the classification written in your medical report.
+                    Do not guess based on symptoms. If you do not know the result,
+                    leave it as Not sure / Not tested.
+                </p>
+            </div>
+
+            <div class="grid">
+                <div class="field">
+                    <label for="resting_bp">Resting blood pressure (mmHg)</label>
+                    <input id="resting_bp" type="number" min="50" max="300" placeholder="From a measurement">
+                </div>
+
+                <div class="field">
+                    <label for="cholesterol">Cholesterol (mg/dL)</label>
+                    <input id="cholesterol" type="number" min="0" max="1000" placeholder="From a lab report">
+                </div>
+
+                <div class="field">
+                    <label for="fasting_blood_sugar">Fasting blood sugar above 120 mg/dL?</label>
+                    <select id="fasting_blood_sugar">
+                        <option value="">Not available</option>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="resting_ecg">Resting ECG result</label>
+                    <select id="resting_ecg">
+                        <option value="">Not available</option>
+                        <option value="0">Normal</option>
+                        <option value="1">ST-T abnormality</option>
+                        <option value="2">LV hypertrophy</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="max_heart_rate">Maximum heart rate</label>
+                    <input id="max_heart_rate" type="number" min="30" max="250" placeholder="From a clinical test">
+                </div>
+
+                <div class="field">
+                    <label for="exercise_induced_angina">Exercise-induced angina</label>
+                    <select id="exercise_induced_angina">
+                        <option value="">Not available</option>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="oldpeak">Oldpeak (ECG/stress test)</label>
+                    <input id="oldpeak" type="number" min="-5" max="10" step="0.1" placeholder="From a clinical report">
+                </div>
+
+                <div class="field">
+                    <label for="st_slope">ST slope</label>
+                    <select id="st_slope">
+                        <option value="">Not available</option>
+                        <option value="1">Upsloping</option>
+                        <option value="2">Flat</option>
+                        <option value="3">Downsloping</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="ca">Major vessels (0–3)</label>
+                    <select id="ca">
+                        <option value="">Not available</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label for="thal">Thal test code</label>
+                    <select id="thal">
+                        <option value="">Not available</option>
+                        <option value="3">Normal (3)</option>
+                        <option value="6">Fixed defect (6)</option>
+                        <option value="7">Reversible defect (7)</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel submit-panel">
+            <div style="font-size:28px;margin-bottom:8px">♥</div>
+            <h2>Ready to analyze your assessment?</h2>
+            <p>Review your answers and confirm that imported measurements match your medical report. The configured model will process the clinical features.</p>
+
+            <button type="submit" class="button button-primary submit-btn" id="submitButton">
+                Analyze my assessment <span aria-hidden="true">→</span>
+            </button>
+
+            <div id="statusMessage" class="status-message" role="status" aria-live="polite"></div>
+
+            <div class="disclaimer">
+                <strong>Educational use only.</strong> The model output is experimental and is not a diagnosis or a clinically validated measure of personal risk. Consult a qualified healthcare professional for medical advice.
+            </div>
+        </section>
+    </form>
+</main>
+
+<footer>
+    <strong>CardioShield-AgeLess</strong> · Educational cardiovascular screening prototype<br>
+    Your browser stores profile and assessment information locally. This page sends clinical model features to your configured Flask endpoint when you submit.
+</footer>
+
+<script>
+"use strict";
+
+const API_URL = "http://127.0.0.1:5000/predict";
+const RESULT_KEY = "cardioResult";
+const ASSESSMENT_KEY = "cardioAssessment";
+const LEGACY_ASSESSMENT_KEY = "cardioShieldData";
+const PROFILE_KEY = "cardioshieldUserProfile";
+
+const $ = id => document.getElementById(id);
+const value = id => $(id) ? String($(id).value ?? "").trim() : "";
+const num = v => v === "" || v == null || !Number.isFinite(Number(v)) ? null : Number(v);
+const yesNo = v => v === "yes" ? 1 : v === "no" ? 0 : null;
+
+function calculateAge(dob) {
+    if (!dob) return null;
+
+    const date = new Date(dob + "T00:00:00");
+    if (Number.isNaN(date.getTime())) return null;
+
+    const today = new Date();
+    let age = today.getFullYear() - date.getFullYear();
+
+    if (
+        today.getMonth() < date.getMonth() ||
+        (today.getMonth() === date.getMonth() &&
+         today.getDate() < date.getDate())
+    ) {
+        age--;
+    }
+
+    return age >= 0 && age <= 120 ? age : null;
+}
+
+function loadProfile() {
+    let profile = {};
+
+    try {
+        profile = JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}");
+    } catch (error) {
+        console.warn("Could not read saved profile.", error);
+    }
+
+    $("profileName").value = profile.fullName || profile.name || "";
+
+    const age = Number(profile.age) || calculateAge(
+        profile.dob || profile.dateOfBirth
+    );
+
+    $("profileAge").value = age || "";
+
+    if (age && !$("age").value) {
+        $("age").value = age;
+    }
+
+    const savedSex = String(
+        profile.sex || profile.gender || ""
+    ).toLowerCase();
+
+    if (!$("sex").value && ["male", "female"].includes(savedSex)) {
+        $("sex").value = savedSex;
+    }
+
+    $("profileStatus").textContent =
+        profile.fullName || profile.name
+            ? "Saved profile loaded. Confirm the age and other assessment values before continuing."
+            : "No saved profile found. You can add your details on the User Profile page.";
+}
+
+const conditionalMap = {
+    hasBP: "bpGroup",
+    hasSmokingInfo: "smokingGroup",
+    hasPhysicalActivityInfo: "activityGroup",
+    hasStressInfo: "stressGroup",
+    hasAlcoholInfo: "alcoholGroup",
+    hasDietInfo: "dietGroup",
+    hasJunkFoodInfo: "junkGroup",
+    hasFamilyHistoryInfo: "familyGroup"
+};
+
+function toggleGroup(groupId, selectValue) {
+    const group = $(groupId);
+    if (!group) return;
+
+    const show = selectValue === "yes";
+    group.classList.toggle("show", show);
+
+    group.querySelectorAll("input, select").forEach(field => {
+        field.disabled = !show;
+
+        if (!show) {
+            field.value = "";
+        }
+    });
+
+    updateProgress();
+}
+
+function updateProgress() {
+    const ids = [
+        "age", "sex", "hasBP", "hasSmokingInfo",
+        "hasPhysicalActivityInfo", "sleep", "hasStressInfo",
+        "hasAlcoholInfo", "hasDietInfo", "hasJunkFoodInfo",
+        "hasFamilyHistoryInfo", "screenTime"
+    ];
+
+    const completed = ids.filter(id => value(id) !== "").length;
+    const percent = Math.round(completed / ids.length * 100);
+
+    $("progressText").textContent = percent + "%";
+    $("progressFill").style.width = percent + "%";
+    $("progressBar").setAttribute("aria-valuenow", String(percent));
+}
+
+function validateAssessment() {
+    const age = num(value("age"));
+
+    if (age === null || age < 1 || age > 120) {
+        alert("Enter a valid age between 1 and 120.");
+        $("age").focus();
+        return false;
+    }
+
+    if (!value("sex")) {
+        alert("Please select your sex.");
+        $("sex").focus();
+        return false;
+    }
+
+    const required = [
+        "hasBP", "hasSmokingInfo", "hasPhysicalActivityInfo",
+        "sleep", "hasStressInfo", "hasAlcoholInfo", "hasDietInfo",
+        "hasJunkFoodInfo", "hasFamilyHistoryInfo", "screenTime"
+    ];
+
+    for (const id of required) {
+        if (!value(id)) {
+            alert("Please answer the required question: " + id + ".");
+            $(id).focus();
+            return false;
+        }
+    }
+
+    if (value("hasBP") === "yes") {
+        const systolic = num(value("systolicBP"));
+        const diastolic = num(value("diastolicBP"));
+
+        if (
+            systolic === null || systolic < 50 || systolic > 300 ||
+            diastolic === null || diastolic < 30 || diastolic > 200 ||
+            diastolic >= systolic
+        ) {
+            alert("Enter valid systolic and diastolic blood pressure values.");
+            $("systolicBP").focus();
+            return false;
+        }
+    }
+
+    if (value("hasSmokingInfo") === "yes") {
+        const cigarettes = num(value("cigsPerDay"));
+
+        if (
+            cigarettes === null ||
+            cigarettes < 0 ||
+            cigarettes > 200
+        ) {
+            alert("Enter valid cigarettes per day.");
+            $("cigsPerDay").focus();
+            return false;
+        }
+    }
+
+    const conditionalChecks = [
+        ["hasPhysicalActivityInfo", "exercise"],
+        ["hasStressInfo", "stress"],
+        ["hasAlcoholInfo", "alcohol"],
+        ["hasDietInfo", "diet"],
+        ["hasJunkFoodInfo", "junkFood"],
+        ["hasFamilyHistoryInfo", "familyHistory"]
+    ];
+
+    for (const [availabilityId, fieldId] of conditionalChecks) {
+        if (value(availabilityId) === "yes" && !value(fieldId)) {
+            alert("Please complete: " + fieldId + ".");
+            $(fieldId).focus();
+            return false;
+        }
+    }
+
+    const ranges = [
+        ["resting_bp", 50, 300],
+        ["cholesterol", 0, 1000],
+        ["max_heart_rate", 30, 250],
+        ["oldpeak", -5, 10]
+    ];
+
+    for (const [id, min, max] of ranges) {
+        if (value(id) === "") continue;
+
+        const number = num(value(id));
+
+        if (number === null || number < min || number > max) {
+            alert("Check the value entered for " + id + ".");
+            $(id).focus();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function collectModelInput() {
+    const sex = value("sex");
+
+    return {
+        age: num(value("age")),
+        sex: sex === "male" ? 1 : sex === "female" ? 0 : null,
+        chest_pain_type: num(value("chest_pain_type")),
+        resting_bp: num(value("resting_bp")),
+        cholesterol: num(value("cholesterol")),
+        fasting_blood_sugar: num(value("fasting_blood_sugar")),
+        resting_ecg: num(value("resting_ecg")),
+        max_heart_rate: num(value("max_heart_rate")),
+        exercise_induced_angina: num(value("exercise_induced_angina")),
+        oldpeak: num(value("oldpeak")),
+        st_slope: num(value("st_slope")),
+        ca: num(value("ca")),
+        thal: num(value("thal"))
+    };
+}
+
+function collectLifestyleData() {
+    return {
+        sex_label: value("sex"),
+        hasBP: value("hasBP"),
+        systolicBP: num(value("systolicBP")),
+        diastolicBP: num(value("diastolicBP")),
+        hasSmokingInfo: value("hasSmokingInfo"),
+        currentSmoker: yesNo(value("hasSmokingInfo")),
+        cigsPerDay: num(value("cigsPerDay")),
+        hasPhysicalActivityInfo: value("hasPhysicalActivityInfo"),
+        exercise: value("exercise") || null,
+        sleep: value("sleep") || null,
+        hasStressInfo: value("hasStressInfo"),
+        stress: value("stress") || null,
+        hasAlcoholInfo: value("hasAlcoholInfo"),
+        alcohol: value("alcohol") || null,
+        hasDietInfo: value("hasDietInfo"),
+        diet: value("diet") || null,
+        hasJunkFoodInfo: value("hasJunkFoodInfo"),
+        junkFood: value("junkFood") || null,
+        hasFamilyHistoryInfo: value("hasFamilyHistoryInfo"),
+        familyHistory: value("familyHistory") || null,
+        screenTime: value("screenTime") || null,
+        assessmentDate: new Date().toISOString()
+    };
+}
+
+function normalizePrediction(result) {
+    let score = null;
+
+    if (result.model_score != null) {
+        score = Number(result.model_score);
+    } else if (result.risk_percentage != null) {
+        score = Number(result.risk_percentage);
+    } else if (result.probability_percentage != null) {
+        score = Number(result.probability_percentage);
+    } else if (result.risk_probability != null) {
+        score = Number(result.risk_probability) * 100;
+    } else if (result.probability != null) {
+        score = Number(result.probability) * 100;
+    }
+
+    if (
+        score === null ||
+        !Number.isFinite(score) ||
+        score < 0 ||
+        score > 100
+    ) {
+        throw new Error("The API did not return a valid model score from 0 to 100.");
+    }
+
+    return {
+        ...result,
+        model_score: score,
+        risk_percentage: score,
+        probability_percentage: score,
+        risk_probability: score / 100,
+        category: "Experimental model output"
+    };
+}
+
+/* Medical report reader: PDF.js for text PDFs, native text for TXT files. */
+async function readReport(file) {
+    if (file.size > 10 * 1024 * 1024) {
+        throw new Error("Choose a report smaller than 10 MB.");
+    }
+
+    const fileName = file.name.toLowerCase();
+
+    if (fileName.endsWith(".txt")) {
+        return await file.text();
+    }
+
+    if (!fileName.endsWith(".pdf")) {
+        throw new Error("Upload a PDF or TXT report.");
+    }
+
+    if (!window.pdfjsLib) {
+        throw new Error("PDF reader failed to load. Check your internet connection and refresh.");
+    }
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    const pdf = await pdfjsLib.getDocument({
+        data: new Uint8Array(await file.arrayBuffer())
+    }).promise;
+
+    let text = "";
+
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+        const page = await pdf.getPage(pageNumber);
+        const content = await page.getTextContent();
+
+        text += content.items.map(item => item.str).join(" ") + "\n";
+    }
+
+    if (!text.trim()) {
+        throw new Error("No readable text found. Scanned PDFs need OCR and are not supported here.");
+    }
+
+    return text;
+}
+
+function normalizeReportText(text) {
+    return text
+        .replace(/\u00a0/g, " ")
+        .replace(/[–—]/g, "-")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function findReportNumber(text, patterns) {
+    for (const pattern of patterns) {
+        const match = text.match(pattern);
+
+        if (match && match[1] !== undefined) {
+            const number = Number(match[1]);
+
+            if (Number.isFinite(number)) {
+                return number;
+            }
+        }
+    }
+
+    return null;
+}
+
+function findReportText(text, patterns) {
+    for (const pattern of patterns) {
+        const match = text.match(pattern);
+
+        if (match && match[1]) {
+            return match[1].trim();
+        }
+    }
+
+    return null;
+}
+
+function extractReportValues(rawText) {
+    const text = normalizeReportText(rawText);
+    const found = {};
+
+    function addNumber(id, number, min, max) {
+        if (number !== null && number >= min && number <= max) {
+            found[id] = String(number);
+        }
+    }
+
+    const bpMatch = text.match(
+        /\b(?:resting\s+)?blood\s+pressure\b\s*[:=-]?\s*(\d{2,3})(?:\s*\/\s*\d{2,3})?\s*(?:mm\s*hg)?/i
+    );
+
+    if (bpMatch) {
+        addNumber("resting_bp", Number(bpMatch[1]), 50, 300);
+    }
+
+    addNumber("cholesterol", findReportNumber(text, [
+        /\btotal\s+cholesterol\b\s*[:=-]?\s*(\d{2,4}(?:\.\d+)?)/i,
+        /\bcholesterol\b\s*[:=-]?\s*(\d{2,4}(?:\.\d+)?)/i
+    ]), 0, 1000);
+
+    addNumber("max_heart_rate", findReportNumber(text, [
+        /\bmaximum\s+heart\s+rate\b\s*[:=-]?\s*(\d{2,3})\b/i,
+        /\bmax\s+heart\s+rate\b\s*[:=-]?\s*(\d{2,3})\b/i
+    ]), 30, 250);
+
+    const sugarAnswer = findReportText(text, [
+        /\bfasting\s+blood\s+sugar\s+above\s+120\s*mg\s*\/?\s*dL\b\s*[:=-]?\s*(yes|no)\b/i,
+        /\bfasting\s+blood\s+sugar\s+above\s+120\b\s*[:=-]?\s*(yes|no)\b/i
+    ]);
+
+    if (sugarAnswer) {
+        found.fasting_blood_sugar =
+            sugarAnswer.toLowerCase() === "yes" ? "1" : "0";
+    } else {
+        const glucose = findReportNumber(text, [
+            /\bfasting\s+(?:blood\s+)?glucose\b\s*[:=-]?\s*(\d{2,3}(?:\.\d+)?)/i,
+            /\bfasting\s+blood\s+sugar\b\s*[:=-]?\s*(\d{2,3}(?:\.\d+)?)/i
+        ]);
+
+        if (glucose !== null && glucose >= 0 && glucose <= 1000) {
+            found.fasting_blood_sugar = glucose > 120 ? "1" : "0";
+        }
+    }
+
+    const ecg = findReportText(text, [
+        /\bresting\s+ECG\s+result\b\s*[:=-]?\s*(normal|ST[- ]?T\s+abnormality|LV\s+hypertrophy)\b/i,
+        /\bresting\s+ECG\b\s*[:=-]?\s*(normal|ST[- ]?T\s+abnormality|LV\s+hypertrophy)\b/i
+    ]);
+
+    if (ecg) {
+        const result = ecg.toLowerCase();
+
+        if (result === "normal") {
+            found.resting_ecg = "0";
+        } else if (result.includes("hypertrophy")) {
+            found.resting_ecg = "2";
+        } else if (result.includes("abnormality")) {
+            found.resting_ecg = "1";
+        }
+    }
+
+    const angina = findReportText(text, [
+        /\bexercise[- ]induced\s+angina\b\s*[:=-]?\s*(yes|no)\b/i
+    ]);
+
+    if (angina) {
+        found.exercise_induced_angina =
+            angina.toLowerCase() === "yes" ? "1" : "0";
+    }
+
+    addNumber("oldpeak", findReportNumber(text, [
+        /\boldpeak\b\s*[:=-]?\s*(-?\d+(?:\.\d+)?)/i
+    ]), -5, 10);
+
+    const slope = findReportText(text, [
+        /\bST\s+slope\b\s*[:=-]?\s*(upsloping|flat|downsloping)\b/i
+    ]);
+
+    if (slope) {
+        const result = slope.toLowerCase();
+        found.st_slope =
+            result === "upsloping" ? "1" :
+            result === "flat" ? "2" : "3";
+    }
+
+    addNumber("ca", findReportNumber(text, [
+        /\bnumber\s+of\s+major\s+vessels\b\s*[:=-]?\s*([0-3])\b/i,
+        /\bmajor\s+vessels\s*(?:\(\s*(?:0\s*-\s*3)?\s*\))?\s*[:=-]?\s*([0-3])\b/i
+    ]), 0, 3);
+
+    const thal = findReportText(text, [
+        /\bthal\s+(?:test\s+)?code\b\s*[:=-]?\s*(normal\s*\(\s*3\s*\)?|fixed\s+defect\s*\(\s*6\s*\)?|reversible\s+defect\s*\(\s*7\s*\)?|[367])\b/i
+    ]);
+
+    if (thal) {
+        const result = thal.toLowerCase();
+
+        if (result.includes("normal") || result === "3") {
+            found.thal = "3";
+        } else if (result.includes("fixed") || result === "6") {
+            found.thal = "6";
+        } else if (result.includes("reversible") || result === "7") {
+            found.thal = "7";
+        }
+    }
+
+    const chestPain = findReportText(text, [
+        /\bchest\s+pain\s+type\b\s*[:=-]?\s*(typical\s+angina|atypical\s+angina|non[- ]anginal\s+pain|asymptomatic)\b/i
+    ]);
+
+    if (chestPain) {
+        const result = chestPain.toLowerCase();
+
+        found.chest_pain_type =
+            result === "typical angina" ? "1" :
+            result === "atypical angina" ? "2" :
+            result.includes("non") ? "3" : "4";
+    }
+
+    return found;
+}
+
+const reportFieldLabels = {
+    resting_bp: "Resting blood pressure",
+    cholesterol: "Cholesterol",
+    max_heart_rate: "Maximum heart rate",
+    fasting_blood_sugar: "Fasting blood sugar above 120 mg/dL",
+    resting_ecg: "Resting ECG result",
+    exercise_induced_angina: "Exercise-induced angina",
+    oldpeak: "Oldpeak",
+    st_slope: "ST slope",
+    ca: "Major vessels",
+    thal: "Thal test code",
+    chest_pain_type: "Chest pain type"
+};
+
+let pendingReportValues = {};
+
+$("extractReportButton").addEventListener("click", async () => {
+    const file = $("medicalReport").files[0];
+    const status = $("reportStatus");
+    const review = $("reportReview");
+    const button = $("extractReportButton");
+
+    if (!file) {
+        status.textContent = "Choose a medical report first.";
+        return;
+    }
+
+    button.disabled = true;
+    status.textContent = "Reading report…";
+    review.hidden = true;
+    pendingReportValues = {};
+
+    try {
+        const reportText = await readReport(file);
+        pendingReportValues = extractReportValues(reportText);
+
+        const preview = $("reportPreview");
+        preview.replaceChildren();
+
+        for (const [id, importedValue] of Object.entries(pendingReportValues)) {
+            const item = document.createElement("li");
+            const field = $(id);
+            let displayValue = importedValue;
+
+            if (field && field.tagName === "SELECT") {
+                const option = Array.from(field.options).find(
+                    opt => opt.value === importedValue
+                );
+
+                if (option) {
+                    displayValue = option.textContent;
+                }
+            }
+
+            item.textContent =
+                (reportFieldLabels[id] || id) + ": " + displayValue;
+
+            preview.appendChild(item);
+        }
+
+        if (!Object.keys(pendingReportValues).length) {
+            status.textContent =
+                "No supported values were confidently identified. Enter values manually from the report.";
+            return;
+        }
+
+        review.hidden = false;
+        status.textContent =
+            Object.keys(pendingReportValues).length +
+            " value(s) recognized. Review them before applying.";
+
+    } catch (error) {
+        console.error("Report reading error:", error);
+        status.textContent = error.message || "Could not read the report.";
+    } finally {
+        button.disabled = false;
+    }
+});
+
+/*
+ * Apply reviewed report values.
+ * If existing values will be replaced, show only ONE confirmation popup.
+ */
+$("applyReportButton").addEventListener("click", () => {
+    const existingValues = Object.entries(pendingReportValues)
+        .filter(([id]) => {
+            const field = $(id);
+            return field && String(field.value).trim() !== "";
+        })
+        .map(([id, importedValue]) => {
+            const field = $(id);
+            const label = reportFieldLabels[id] || id;
+            let displayValue = importedValue;
+
+            if (field.tagName === "SELECT") {
+                const option = Array.from(field.options).find(
+                    opt => opt.value === importedValue
+                );
+
+                if (option) {
+                    displayValue = option.textContent;
+                }
+            }
+
+            return label + ': current value "' + field.value +
+                '" → report value "' + displayValue + '"';
+        });
+
+    if (existingValues.length > 0) {
+        const message =
+            "The report contains values for fields that already have answers:\n\n" +
+            existingValues.join("\n") +
+            "\n\nReplace these existing values with the reviewed report values?";
+
+        if (!confirm(message)) {
+            $("reportStatus").textContent =
+                "No values were changed. You can review the report again.";
+            return;
+        }
+    }
+
+    let updated = 0;
+
+    for (const [id, importedValue] of Object.entries(pendingReportValues)) {
+        const field = $(id);
+        if (!field) continue;
+
+        field.value = importedValue;
+        field.classList.add("imported-field");
+        field.title = "Imported from report — verify against the original";
+
+        field.dispatchEvent(new Event("input", { bubbles: true }));
+        field.dispatchEvent(new Event("change", { bubbles: true }));
+
+        updated++;
+    }
+
+    $("reportStatus").textContent =
+        updated + " field(s) updated. Verify them against the original report.";
+
+    updateProgress();
+});
+
+function showStatus(message, type) {
+    const status = $("statusMessage");
+    status.textContent = message;
+    status.className = "status-message show " + type;
+}
+
+async function submitAssessment() {
+    const button = $("submitButton");
+
+    if (!validateAssessment()) return;
+
+    button.disabled = true;
+    const originalText = button.textContent;
+    button.textContent = "Analyzing your assessment…";
+
+    showStatus(
+        "Sending the clinical features to the prediction service…",
+        "success"
+    );
+
+    try {
+        const modelInput = collectModelInput();
+        const lifestyleData = collectLifestyleData();
+
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(modelInput)
+        });
+
+        let result;
+
+        try {
+            result = await response.json();
+        } catch {
+            throw new Error(
+                "The server did not return valid JSON. Check your Flask backend."
+            );
+        }
+
+        // Show the actual error returned by the Flask API.
+        if (!response.ok || result.success === false) {
+            const details = result.details
+                ? " Details: " + result.details
+                : "";
+
+            throw new Error(
+                (result.error || result.message || "Prediction failed.") +
+                details
+            );
+        }
+
+        // Validate and normalize the model's prediction.
+        const savedResult = normalizePrediction(result);
+
+        const assessment = {
+            ...modelInput,
+            ...lifestyleData,
+            model_features: modelInput,
+            lifestyle: lifestyleData
+        };
+
+        // Save assessment and prediction only after successful analysis.
+        localStorage.setItem(
+            ASSESSMENT_KEY,
+            JSON.stringify(assessment)
+        );
+
+        localStorage.setItem(
+            LEGACY_ASSESSMENT_KEY,
+            JSON.stringify(assessment)
+        );
+
+        localStorage.setItem(
+            "cardioShieldAssessmentCompleted",
+            "true"
+        );
+
+        localStorage.setItem(
+            RESULT_KEY,
+            JSON.stringify(savedResult)
+        );
+
+        showStatus(
+            "Assessment completed. Opening dashboard…",
+            "success"
+        );
+
+        window.location.href = "dashboard.html";
+
+    } catch (error) {
+        console.error("Assessment error:", error);
+
+        showStatus(
+            "Assessment failed: " + error.message +
+            " Check that Flask is running at " + API_URL +
+            " and that the model accepts the submitted features.",
+            "error"
+        );
+
+        button.disabled = false;
+        button.textContent = originalText;
+    }
+}
+document.addEventListener("DOMContentLoaded", () => {
+    loadProfile();
+
+    Object.entries(conditionalMap).forEach(([selectId, groupId]) => {
+        $(selectId).addEventListener("change", () => {
+            toggleGroup(groupId, value(selectId));
+        });
+
+        toggleGroup(groupId, value(selectId));
+    });
+
+    $("assessmentForm").addEventListener("submit", event => {
+        event.preventDefault();
+        submitAssessment();
+    });
+
+    $("assessmentForm").querySelectorAll("input, select").forEach(field => {
+        field.addEventListener("input", updateProgress);
+        field.addEventListener("change", updateProgress);
+    });
+
+    updateProgress();
+});
+</script>
+
+</body>
+</html>

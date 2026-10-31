@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CardioShield-AgeLess | Health Intelligence</title>
+/* ======================================================
+   CARDIOSHIELD - DIRECT PDF DOWNLOAD
+   ====================================================== */
+
+const exportPdfButton = $("exportPdf");
+
+if (exportPdfButton) {
+
+    exportPdfButton.addEventListener("click", async function () {
+
+        const button = this;
+        const originalText = button.textContent;
+        let report = null;
+
+        try {
+
+            button.disabled = true;
+            button.textContent = "Generating PDF...";
+
+            // Refresh saved dashboard information
+            if (typeof loadDashboard === "function") {
+                loadDashboard();
+            }
+
+            // Verify saved prediction
+            if (
+                currentScore === null ||
+                !Number.isFinite(Number(currentScore))
+            ) {
+                throw new Error(
+                    "No saved prediction found. Complete an assessment first."
+                );
+            }
+
+            // Check PDF library
+            if (typeof window.html2pdf !== "function") {
+                throw new Error(
+                    "PDF library not loaded. Check your internet connection and refresh."
+                );
+            }
+
+            // Create report
+            report = buildPdfReport();
+
+            if (!report) {
+                throw new Error("Unable to create the report.");
+            }
+
+            // Prepare report for PDF rendering
+            Object.assign(report.style, {
+                position: "static",
+                display: "block",
+                width: "794px",
+                maxWidth: "794px",
+                minHeight: "0",
+                margin: "0",
+                visibility: "visible",
+                opacity: "1",
+                pointerEvents: "auto",
+                background: "#ffffff",
+                overflow: "visible"
+            });
+
+            document.body.appendChild(report);
+
+            // Wait for rendering
+            await new Promise(resolve => {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(resolve);
+                });
+            });
+
+            if (document.fonts && document.fonts.ready) {
+                await document.fonts.ready;
+            }
+
+            // Confirm report is visible
+            const rect = report.getBoundingClientRect();
+
+            if (rect.width <= 0 || rect.height <= 0) {
+                throw new Error("PDF report has invalid dimensions.");
+            }
+
+            // Direct PDF download settings
+            const options = {
+                margin: [8, 8, 8, 8],
+
+                filename: "CardioShield-Health-Report.pdf",
+
+                image: {
+                    type: "jpeg",
+                    quality: 0.98
+                },
+
+                html2canvas: {
+                    scale: 2,
+                    backgroundColor: "#ffffff",
+                    useCORS: true,
+                    logging: false,
+                    scrollX: 0,
+                    scrollY: 0,
+                    windowWidth: 900
+                },
+
+                jsPDF: {
+                    unit: "mm",
+                    format: "a4",
+                    orientation: "portrait",
+                    compress: true
+                },
+
+                pagebreak: {
+                    mode: ["css", "legacy"]
+                }
+            };
+
+            // Generate and automatically download PDF
+            await window.html2pdf()
+                .set(options)
+                .from(report)
+                .save();
+
+            const message = $("plannerMessage");
+
+            if (message) {
+                message.textContent =
+                    "Your CardioShield PDF downloaded successfully.";
+            }
+
+        } catch (error) {
+
+            console.error("CardioShield PDF error:", error);
+
+            alert(
+                "PDF download failed:\n" +
+                (error.message || String(error))
+            );
+
+        } finally {
+
+            if (report && report.parentNode) {
+                report.parentNode.removeChild(report);
+            }
+
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+
+    });
+}
+
+/* END DIRECT PDF DOWNLOAD */
+<style>
+:root{
+ --navy:#102c3d;
+ --teal:#14877e;
+ --mint:#e8f6f3;
+ --bg:#f3f7f9;
+ --text:#1c3543;
+ --muted:#81919b;
+ --line:#e5edf0;
+ --amber:#c58b35;
+ --red:#c95d63;
+ --shadow:0 8px 30px rgba(18,48,64,.055);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+ margin:0;background:var(--bg);color:var(--text);
+ font-family:Arial,Helvetica,sans-serif;font-size:14px
+}
+a{text-decoration:none;color:inherit}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh}
+.sidebar{
+ position:fixed;inset:0 auto 0 0;width:245px;
+ background:var(--navy);color:white;padding:25px 17px;
+ display:flex;flex-direction:column;z-index:10
+}
+.brand{display:flex;align-items:center;gap:11px;padding:0 7px 30px}
+.logo{
+ width:43px;height:43px;border-radius:14px;
+ background:linear-gradient(140deg,#35b8a6,#11756d);
+ display:grid;place-items:center;font-size:24px
+}
+.brand-name{font-size:15px;font-weight:800}
+.brand-sub{font-size:9px;color:#a1bdc5;letter-spacing:1.4px;margin-top:4px}
+.nav-heading{font-size:9px;color:#83a6b0;letter-spacing:1.7px;padding:12px}
+.nav{display:flex;flex-direction:column;gap:5px}
+.nav a{
+ display:flex;align-items:center;gap:12px;padding:12px;
+ border-radius:10px;color:#b9cdd3;font-size:12px;font-weight:650
+}
+.nav a:hover,.nav a.active{background:#205363;color:white}
+.nav-icon{width:20px;text-align:center;font-size:16px}
+.side-space{flex:1}
+.side-card{
+ padding:15px;border:1px solid #345665;border-radius:13px;
+ background:#173b4b;margin-bottom:15px
+}
+.side-card p{font-size:10px;color:#a9c2ca;line-height:1.8}
+.side-footer{
+ border-top:1px solid #2c4b58;padding:14px 7px 0;
+ color:#91aeb8;font-size:10px;line-height:1.8
+}
+.main{margin-left:245px;padding:29px 34px 24px;min-width:0}
+.page{max-width:1450px;margin:auto}
+.topbar{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:18px;margin-bottom:23px
+}
+.eyebrow{font-size:9px;color:var(--teal);font-weight:850;letter-spacing:1.7px;margin-bottom:7px}
+h1{font-size:29px;letter-spacing:-1px;line-height:1.2;margin:0;font-weight:800}
+.subtitle{font-size:12px;color:var(--muted);margin-top:8px}
+.top-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.btn{
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ padding:10px 14px;border:1px solid var(--line);border-radius:10px;
+ background:white;color:var(--text);font-size:11px;font-weight:750
+}
+.btn-primary{background:var(--teal);border-color:var(--teal);color:white}
+.btn-danger{color:#b54e56}
+.btn:disabled{opacity:.6;cursor:wait}
+.avatar{
+ width:38px;height:38px;border-radius:12px;background:#d9efeb;
+ color:var(--teal);display:grid;place-items:center;font-weight:800
+}
+.notice{
+ display:flex;gap:10px;padding:12px 15px;background:#fff9ed;
+ border:1px solid #f0e4c8;border-radius:11px;margin-bottom:20px;
+ color:#78603a;font-size:10px;line-height:1.8
+}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:19px}
+.stat,.card{background:white;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.stat{padding:17px 18px;min-width:0}
+.stat-top{display:flex;justify-content:space-between;align-items:center}
+.stat-label{font-size:9px;color:var(--muted);font-weight:850;letter-spacing:1px}
+.stat-icon{
+ width:31px;height:31px;border-radius:10px;background:#e9f5f3;
+ color:var(--teal);display:grid;place-items:center
+}
+.stat-value{font-size:25px;font-weight:800;margin:13px 0 4px;overflow-wrap:anywhere}
+.stat-note{font-size:10px;color:var(--muted);line-height:1.6}
+.main-grid{
+ display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,.8fr);
+ gap:17px;margin-bottom:23px
+}
+.card{padding:21px;min-width:0}
+.score-card{background:linear-gradient(125deg,#fff 0%,#fff 65%,#effaf7 100%)}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.card-title{font-size:14px;font-weight:800}
+.card-subtitle{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.7}
+.pill{
+ display:inline-flex;align-items:center;gap:5px;padding:6px 9px;
+ border-radius:8px;background:var(--mint);color:var(--teal);
+ font-size:9px;font-weight:800;white-space:nowrap
+}
+.score-layout{display:flex;align-items:center;gap:25px;margin-top:24px}
+.gauge{width:150px;height:150px;flex-shrink:0;position:relative}
+.gauge svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gauge-track{fill:none;stroke:#e7efef;stroke-width:9}
+.gauge-progress{
+ fill:none;stroke:var(--teal);stroke-width:9;stroke-linecap:round;
+ stroke-dasharray:314;stroke-dashoffset:314;transition:stroke-dashoffset .7s
+}
+.gauge-center{
+ position:absolute;inset:0;display:flex;align-items:center;
+ justify-content:center;flex-direction:column
+}
+.gauge-value{font-size:34px;font-weight:850}
+.gauge-label{font-size:9px;color:var(--muted);letter-spacing:1px}
+.score-details{flex:1;min-width:0}
+.score-details h3{font-size:18px;line-height:1.4;margin:12px 0 7px}
+.score-details p{font-size:11px;color:var(--muted);line-height:1.85;margin:0 0 14px}
+.link{font-size:11px;color:var(--teal);font-weight:800}
+.snapshot-symbol{
+ height:42px;width:42px;border-radius:13px;background:#e8f5f2;
+ display:grid;place-items:center;color:var(--teal);font-size:23px
+}
+.snapshot-title{font-size:18px;font-weight:800;margin:23px 0 7px}
+.snapshot-copy{font-size:11px;color:var(--muted);line-height:1.85}
+.rule{height:1px;background:var(--line);margin:18px 0}
+.snapshot-meta{display:flex;justify-content:space-between;gap:10px;font-size:10px}
+.snapshot-meta span{color:var(--muted)}
+.section-head{
+ display:flex;justify-content:space-between;align-items:flex-end;
+ gap:12px;margin:27px 0 13px
+}
+.section-head h2{font-size:18px;margin:0;font-weight:800}
+.section-head p{font-size:10px;color:var(--muted);margin:5px 0 0}
+.kicker{font-size:9px;letter-spacing:1px;color:var(--teal);font-weight:850}
+.insight-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.insight{background:white;border:1px solid var(--line);border-radius:14px;padding:17px}
+.insight-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.insight-icon{
+ width:37px;height:37px;border-radius:12px;background:#edf7f5;
+ display:grid;place-items:center;font-size:18px
+}
+.insight-number{font-size:9px;color:#a1afb6;font-weight:800}
+.insight h3{font-size:12px;margin:0 0 7px}
+.insight p{font-size:10px;color:var(--muted);line-height:1.85;margin:0}
+.planner{margin-top:22px}
+.planner-grid{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:22px;margin-top:24px
+}
+.planner-label{
+ display:flex;justify-content:space-between;gap:8px;
+ font-size:11px;font-weight:750;margin-bottom:13px
+}
+.planner-label output{color:var(--teal);font-weight:850}
+input[type=range]{width:100%;accent-color:var(--teal)}
+.helper{font-size:9px;color:var(--muted);line-height:1.8;margin-top:9px}
+.progress-list{margin-top:23px;padding-top:19px;border-top:1px solid var(--line)}
+.progress-item{margin-bottom:17px}
+.progress-head{display:flex;justify-content:space-between;gap:10px;font-size:10px;margin-bottom:8px}
+.progress-head span{color:var(--muted);text-align:right}
+.track{height:6px;background:#edf2f4;border-radius:9px;overflow:hidden}
+.bar{
+ height:100%;width:0;background:linear-gradient(90deg,#14877e,#45b7a7);
+ border-radius:9px;transition:width .3s
+}
+.planner-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:19px}
+.message{font-size:10px;color:var(--muted);margin:13px 0 0;line-height:1.7}
+.prevention{margin-top:20px}
+.prevention-content{margin-top:17px}
+.prevention-top{display:flex;justify-content:space-between;align-items:flex-start;gap:15px}
+.prevention-content h3{font-size:16px;margin:12px 0 7px}
+.prevention-content p{font-size:11px;color:var(--muted);line-height:1.85;margin:0}
+.prevention-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-top:19px}
+.prevention-tip{padding:14px;background:#f7fafb;border:1px solid #edf2f4;border-radius:12px}
+.prevention-tip span{font-size:19px}
+.prevention-tip h4{font-size:11px;margin:9px 0 5px}
+.prevention-tip p{font-size:10px;line-height:1.8;color:var(--muted);margin:0}
+.emergency{
+ background:#fff4f2;border:1px solid #f2dcd8;color:#874340;
+ padding:15px;border-radius:12px;margin-top:17px
+}
+.emergency h3{font-size:12px;margin:0 0 6px}
+.emergency p{font-size:10px;line-height:1.85;margin:0}
+.sources{display:flex;flex-wrap:wrap;gap:17px;margin-top:15px}
+.sources a{font-size:10px;font-weight:750;color:var(--teal)}
+.details-area{margin-top:25px}
+details{
+ background:white;border:1px solid var(--line);border-radius:13px;
+ margin-bottom:10px;box-shadow:0 3px 12px #102c3d04
+}
+summary{
+ display:flex;justify-content:space-between;gap:12px;
+ cursor:pointer;list-style:none;padding:16px 18px;font-size:11px;font-weight:800
+}
+summary::-webkit-details-marker{display:none}
+summary:after{content:"＋";color:var(--teal);font-size:16px}
+details[open] summary:after{content:"−"}
+.details-body{padding:0 18px 19px}
+.muted{font-size:10px;color:var(--muted);line-height:1.8}
+.data-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:14px}
+.data-item{padding:11px;border-radius:9px;background:#f6f9fa;min-width:0}
+.data-key{font-size:9px;color:var(--muted);overflow-wrap:anywhere}
+.data-val{font-size:11px;font-weight:750;margin-top:5px;overflow-wrap:anywhere}
+.empty{padding:15px;border-radius:10px;background:#f6f9fa;font-size:11px;color:var(--muted);line-height:1.8}
+.shap-row{
+ display:grid;grid-template-columns:minmax(90px,1fr) 2fr 65px;
+ gap:10px;align-items:center;margin:13px 0;font-size:10px
+}
+.shap-track{height:7px;background:#edf2f4;border-radius:8px;overflow:hidden}
+.shap-bar{height:100%;border-radius:8px}
+.shap-value{text-align:right;font-variant-numeric:tabular-nums}
+.global-images{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.global-image{width:100%;height:auto;border:1px solid var(--line);border-radius:10px;display:block}
+.bottom-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:21px}
+.footer{text-align:center;color:var(--muted);font-size:9px;line-height:1.9;padding:26px 0 5px}
+@media(max-width:1200px){
+ .main{padding:24px 22px}
+ .sidebar{width:220px}
+ .main{margin-left:220px}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .data-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+@media(max-width:700px){
+ .sidebar{position:relative;width:100%;inset:auto;padding:15px}
+ .brand{padding:0 5px 15px}
+ .nav-heading,.side-card,.side-footer,.side-space{display:none}
+ .nav{flex-direction:row;gap:5px;overflow-x:auto}
+ .nav a{white-space:nowrap;padding:9px 10px;font-size:10px}
+ .app{display:block}
+ .main{margin:0;padding:21px 14px}
+ .topbar{align-items:flex-start;flex-direction:column}
+ .top-actions{width:100%}
+ .top-actions .btn{flex:1}
+ h1{font-size:25px}
+ .stats{gap:10px}
+ .stat{padding:14px}
+ .stat-value{font-size:22px}
+ .score-layout{gap:16px}
+ .gauge{width:120px;height:120px}
+ .gauge-value{font-size:28px}
+ .score-details h3{font-size:15px}
+ .insight-grid,.planner-grid,.prevention-grid{grid-template-columns:1fr}
+ .data-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .global-images{grid-template-columns:1fr}
+ .card{padding:17px}
+}
+@media(max-width:390px){
+ .score-layout{flex-direction:column;align-items:center}
+ .score-details{text-align:center}
+}
+@media print{
+ .sidebar,.top-actions,.bottom-actions,.planner-actions,input[type=range],.notice{display:none!important}
+ .main{margin:0;padding:0}
+ body{background:white}
+ .card,.stat,details{box-shadow:none;break-inside:avoid}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<aside class="sidebar">
+ <div class="brand">
+  <div class="logo">♡</div>
+  <div>
+   <div class="brand-name">CardioShield</div>
+   <div class="brand-sub">HEALTH INTELLIGENCE</div>
+  </div>
+ </div>
+ <div class="nav-heading">Workspace</div>
+ <nav class="nav">
+  <a class="active" href="#overview"><span class="nav-icon">⌂</span>Overview</a>
+  <a href="#insights"><span class="nav-icon">✳</span>Health insights</a>
+  <a href="#routine"><span class="nav-icon">◷</span>My routine</a>
+  <a href="#prevention"><span class="nav-icon">♡</span>Prevention</a>
+  <a href="#records"><span class="nav-icon">▤</span>Health records</a>
+  <a href="#explainability"><span class="nav-icon">⌁</span>Model insights</a>
+ </nav>
+ <div class="side-space"></div>
+ <div class="side-card">
+  <strong>Small steps matter</strong>
+  <p>Build healthy habits and discuss concerns with a qualified healthcare professional.</p>
+ </div>
+ <div class="side-footer">CardioShield-AgeLess<br>Educational prototype · Not a diagnosis</div>
+</aside>
+
+<main class="main">
+<div class="page">
+
+<header class="topbar" id="overview">
+ <div>
+  <div class="eyebrow">HEALTH INTELLIGENCE PLATFORM</div>
+  <h1>Your health overview</h1>
+  <div class="subtitle">Understand your latest result and focus on your next steps.</div>
+ </div>
+ <div class="top-actions">
+  <a class="btn" href="profile.html">◎ Edit profile</a>
+  <a class="btn btn-primary" href="assessment.html">＋ New assessment</a>
+  <div class="avatar">♡</div>
+ </div>
+</header>
+
+<div class="notice">
+ <span>ⓘ</span>
+ <div><strong>Educational prototype, not a diagnosis.</strong>
+ Score bands are illustrative and not clinically validated.
+ A low score cannot rule out heart disease. Never delay emergency care to check this dashboard.</div>
+</div>
+
+<section class="stats">
+ <article class="stat">
+  <div class="stat-top"><span class="stat-label">MODEL SCORE</span><span class="stat-icon">◉</span></div>
+  <div class="stat-value" id="statScore">—</div>
+  <div class="stat-note">Experimental model output</div>
+ </article>
+ <article class="stat">
+  <div class="stat-top"><span class="stat-label">AGE</span><span class="stat-icon">♙</span></div>
+  <div class="stat-value" id="statAge">—</div>
+  <div class="stat-note">Saved assessment or profile</div>
+ </article>
+ <article class="stat">
+  <div class="stat-top"><span class="stat-label">ASSESSMENT DATE</span><span class="stat-icon">▦</span></div>
+  <div class="stat-value" id="statDate" style="font-size:16px">Not recorded</div>
+  <div class="stat-note">Date linked to saved result</div>
+ </article>
+ <article class="stat">
+  <div class="stat-top"><span class="stat-label">SHAP FEATURES</span><span class="stat-icon">⌁</span></div>
+  <div class="stat-value" id="statShap">0</div>
+  <div class="stat-note">Individual contributions available</div>
+ </article>
+</section>
+
+<section class="main-grid">
+ <article class="card score-card">
+  <div class="card-head">
+   <div><div class="card-title">Assessment analytics</div><div class="card-subtitle">Your latest saved model result</div></div>
+   <span class="pill">MODEL OVERVIEW</span>
+  </div>
+  <div class="score-layout">
+   <div class="gauge">
+    <svg viewBox="0 0 120 120" aria-label="Experimental model score">
+     <circle class="gauge-track" cx="60" cy="60" r="50"></circle>
+     <circle class="gauge-progress" id="gaugeProgress" cx="60" cy="60" r="50"></circle>
+    </svg>
+    <div class="gauge-center">
+     <div class="gauge-value" id="gaugeValue">—</div>
+     <div class="gauge-label">OUT OF 100</div>
+    </div>
+   </div>
+   <div class="score-details">
+    <span class="pill" id="scoreTag">● Awaiting assessment</span>
+    <h3 id="scoreTitle">Your score will appear here</h3>
+    <p id="scoreDescription">Complete and save an assessment to view your experimental model output.</p>
+    <a class="link" id="scoreAction" href="assessment.html">Start an assessment →</a>
+   </div>
+  </div>
+ </article>
+
+ <article class="card">
+  <div class="card-head">
+   <div><div class="card-title">Health snapshot</div><div class="card-subtitle">A quick look at your latest result</div></div>
+   <div class="snapshot-symbol">♡</div>
+  </div>
+  <div class="snapshot-title" id="snapshotTitle">Ready when you are</div>
+  <div class="snapshot-copy" id="snapshotText">Your saved assessment summary will appear here.</div>
+  <div class="rule"></div>
+  <div class="snapshot-meta"><span>Saved health information</span><a class="link" href="#records">View details ↗</a></div>
+ </article>
+</section>
+
+<section id="insights">
+ <div class="section-head">
+  <div><h2>Health insights</h2><p>Simple ideas for everyday heart health</p></div>
+  <span class="kicker">YOUR WELLNESS</span>
+ </div>
+ <div class="insight-grid">
+  <article class="insight">
+   <div class="insight-top"><div class="insight-icon">🩺</div><span class="insight-number">01</span></div>
+   <h3>Know your numbers</h3>
+   <p>Discuss appropriate blood pressure, cholesterol and glucose checks with a healthcare professional.</p>
+  </article>
+  <article class="insight">
+   <div class="insight-top"><div class="insight-icon">🥗</div><span class="insight-number">02</span></div>
+   <h3>Everyday balance</h3>
+   <p>Choose balanced meals, avoid tobacco and build activity into your routine as appropriate.</p>
+  </article>
+  <article class="insight">
+   <div class="insight-top"><div class="insight-icon">🌙</div><span class="insight-number">03</span></div>
+   <h3>Rest and recovery</h3>
+   <p>Aim for regular, sufficient sleep and find manageable ways to reduce stress.</p>
+  </article>
+ </div>
+</section>
+
+<section class="card planner" id="routine">
+ <div class="card-head">
+  <div><div class="card-title">My routine</div><div class="card-subtitle">Set personal goals and see progress update live</div></div>
+  <span class="pill">WELLNESS PLANNER</span>
+ </div>
+ <div class="planner-grid">
+  <div>
+   <label class="planner-label" for="activity"><span>🏃 Weekly activity</span><output id="activityOut">150 min</output></label>
+   <input id="activity" type="range" min="0" max="420" step="15" value="150">
+   <div class="helper">Reference: 150 minutes of moderate activity weekly, if appropriate for you.</div>
+  </div>
+  <div>
+   <label class="planner-label" for="sleep"><span>😴 Nightly sleep</span><output id="sleepOut">8 hrs</output></label>
+   <input id="sleep" type="range" min="3" max="12" step=".5" value="8">
+   <div class="helper">Many adults need around 7–9 hours of sleep each night.</div>
+  </div>
+  <div>
+   <label class="planner-label" for="water"><span>💧 Daily water</span><output id="waterOut">2 L</output></label>
+   <input id="water" type="range" min=".5" max="5" step=".25" value="2">
+   <div class="helper">Fluid needs vary. Follow medical advice if you have a fluid restriction.</div>
+  </div>
+ </div>
+ <div class="progress-list">
+  <div class="progress-item">
+   <div class="progress-head"><strong>Weekly activity</strong><span id="activityProgressText">150 min planned</span></div>
+   <div class="track"><div class="bar" id="activityBar"></div></div>
+  </div>
+  <div class="progress-item">
+   <div class="progress-head"><strong>Nightly sleep</strong><span id="sleepProgressText">8 hours planned</span></div>
+   <div class="track"><div class="bar" id="sleepBar"></div></div>
+  </div>
+  <div class="progress-item">
+   <div class="progress-head"><strong>Water target</strong><span id="waterProgressText">2 litres planned</span></div>
+   <div class="track"><div class="bar" id="waterBar"></div></div>
+  </div>
+ </div>
+ <div class="planner-actions">
+  <button class="btn" id="resetPlanner" type="button">Reset</button>
+  <button class="btn btn-primary" id="savePlanner" type="button">Save goals</button>
+ </div>
+ <p class="message" id="plannerMessage" aria-live="polite">These are planned targets, not verified activity or a medical prescription.</p>
+</section>
+
+<section class="card prevention" id="prevention">
+ <div class="card-head">
+  <div><div class="card-title">Your prevention guide</div><div class="card-subtitle">Educational guidance matched to your saved display band</div></div>
+  <span class="pill">HEALTH EDUCATION</span>
+ </div>
+ <div class="prevention-content" id="preventionContent">
+  <div class="empty">Save an assessment to view the matching educational guide.</div>
+ </div>
+ <div class="emergency">
+  <h3>🚨 Possible heart-attack symptoms? Do not wait for the model.</h3>
+  <p>Chest pressure or pain, pain spreading to the arm, jaw or back, shortness of breath, cold sweating, nausea or faintness may require emergency care. In India, call <strong>112</strong>. Do not delay emergency care to complete an assessment.</p>
+ </div>
+ <div class="sources">
+  <a href="https://www.who.int/news-room/fact-sheets/detail/cardiovascular-diseases-(cvds)" target="_blank" rel="noopener">WHO guidance ↗</a>
+  <a href="https://www.cdc.gov/heart-disease/prevention/index.html" target="_blank" rel="noopener">CDC prevention ↗</a>
+  <a href="https://www.heart.org/en/health-topics/heart-attack/warning-signs-of-a-heart-attack" target="_blank" rel="noopener">AHA warning signs ↗</a>
+ </div>
+</section>
+
+<section class="details-area" id="records">
+ <div class="section-head"><div><h2>Your records</h2><p>Technical details stay tucked away until you need them</p></div></div>
+
+ <details>
+  <summary>View saved health details</summary>
+  <div class="details-body">
+   <p class="muted">Assessment values take priority over profile values. Only saved details are shown.</p>
+   <div class="data-grid" id="healthData"><div class="empty">No saved details found.</div></div>
+  </div>
+ </details>
+
+ <details id="explainability">
+  <summary>Explainable AI · Individual SHAP contributions</summary>
+  <div class="details-body">
+   <p class="muted">Only genuine numeric contributions saved with the prediction are shown. These describe model behavior, not causation or a clinical diagnosis.</p>
+   <div id="shapContent"><div class="empty">Individual SHAP contributions are not available in the saved result.</div></div>
+  </div>
+ </details>
+
+ <details>
+  <summary>Global model explanations</summary>
+  <div class="details-body">
+   <p class="muted">Global plots describe dataset-level patterns and do not necessarily explain this individual prediction.</p>
+   <div class="global-images">
+    <div><p class="muted">Feature importance</p><img class="global-image" src="model/shap/shap_feature_importance.png" alt="Global SHAP feature importance" onerror="this.style.display='none'"></div>
+    <div><p class="muted">SHAP summary</p><img class="global-image" src="model/shap/shap_summary.png" alt="Global SHAP summary" onerror="this.style.display='none'"></div>
+   </div>
+  </div>
+ </details>
+</section>
+
+<div class="bottom-actions">
+ <a class="btn" href="profile.html">◎ Edit profile</a>
+ <a class="btn" href="assessment.html">＋ Update assessment</a>
+ <button class="btn btn-primary" id="exportPdf" type="button">↓ Download prediction PDF</button>
+ <button class="btn btn-danger" id="clearData" type="button">Clear saved assessment</button>
+</div>
+
+<footer class="footer">
+ CardioShield-AgeLess · Health Intelligence Platform<br>
+ Educational prototype · Not a substitute for professional medical advice
+</footer>
+
+</div>
+</main>
+</div>
+
+<script>
+"use strict";
+
+/* STORAGE KEYS */
+const STORAGE_KEYS={
+ result:"cardioResult",
+ assessment:"cardioAssessment",
+ legacy:"cardioShieldData",
+ profile:"cardioshieldUserProfile",
+ planner:"cardioShieldHabitPlanner"
+};
+
+let currentResult={};
+let currentAssessment={};
+let currentProfile={};
+let currentScore=null;
+let currentPredictionLabel=null;
+
+const $=id=>document.getElementById(id);
+
+function readStorage(key){
+ try{
+  const value=localStorage.getItem(key);
+  return value?JSON.parse(value):null;
+ }catch(error){
+  console.warn("Storage read error:",key,error);
+  return null;
+ }
+}
+
+function saveStorage(key,value){
+ try{
+  localStorage.setItem(key,JSON.stringify(value));
+  return true;
+ }catch(error){
+  console.error("Storage save error:",error);
+  return false;
+ }
+}
+
+function obj(value){
+ return value&&typeof value==="object"&&!Array.isArray(value)?value:{};
+}
+
+function firstAvailable(...values){
+ return values.find(value=>value!==undefined&&value!==null&&value!=="");
+}
+
+function flattenObject(object,prefix="",output={}){
+ if(!object||typeof object!=="object")return output;
+ Object.entries(object).forEach(([key,value])=>{
+  const name=prefix?prefix+"."+key:key;
+  if(value&&typeof value==="object"&&!Array.isArray(value)){
+   flattenObject(value,name,output);
+  }else if(value===null||["string","number","boolean"].includes(typeof value)){
+   output[name]=value;
+  }else if(Array.isArray(value)&&value.every(v=>v===null||["string","number","boolean"].includes(typeof v))){
+   output[name]=value.join(", ");
+  }
+ });
+ return output;
+}
+
+function norm(key){
+ return String(key).replace(/([a-z])([A-Z])/g,"$1 $2")
+ .replace(/[._-]+/g," ").trim().toLowerCase().replace(/\s+/g," ");
+}
+
+function combinedData(assessment,profile){
+ const p=flattenObject(profile);
+ const a=flattenObject(assessment);
+ const merged={...p,...a};
+ const selected=new Map();
+ Object.entries(merged).forEach(([key,value])=>{
+  const k=norm(key);
+  if(!selected.has(k)||Object.prototype.hasOwnProperty.call(a,key)){
+   selected.set(k,{key,value});
+  }
+ });
+ return [...selected.values()];
+}
+
+function labelFor(key){
+ const labels={
+  age:"Age",sex:"Sex",gender:"Gender",dob:"Date of birth",
+  "date of birth":"Date of birth","assessment date":"Assessment date",
+  "tot chol":"Cholesterol",cholesterol:"Cholesterol",
+  "sys bp":"Resting blood pressure","resting bp":"Resting blood pressure",
+  "chest pain type":"Chest pain type","max heart rate":"Maximum heart rate",
+  "fasting blood sugar":"Fasting blood sugar","resting ecg":"Resting ECG",
+  "exercise induced angina":"Exercise-induced angina",oldpeak:"Oldpeak",
+  "st slope":"ST slope",ca:"CA",thal:"Thal",height:"Height",weight:"Weight",
+  sleep:"Sleep","screen time":"Screen time","current smoker":"Current smoker",
+  "risk percentage":"Model score","probability percentage":"Model score",
+  "risk probability":"Risk probability",prediction:"Prediction"
+ };
+ const k=norm(key);
+ return labels[k]||k.split(" ").map(w=>w?w[0].toUpperCase()+w.slice(1):"").join(" ");
+}
+
+function fmt(value){
+ if(typeof value==="boolean")return value?"Yes":"No";
+ if(typeof value==="number")return Number.isInteger(value)?String(value):String(Number(value.toFixed(4)));
+ return String(value);
+}
+
+/* FIND NESTED MODEL RESPONSES */
+function resultObjects(root){
+ const out=[],seen=new Set();
+ function visit(value,depth){
+  if(!value||typeof value!=="object"||Array.isArray(value)||seen.has(value)||depth>4)return;
+  seen.add(value);
+  out.push(value);
+  ["result","prediction_result","predictionResult","data","output","response",
+   "model_output","modelOutput","prediction","risk","assessment_result"].forEach(key=>{
+   const child=value[key];
+   if(child&&typeof child==="object"&&!Array.isArray(child))visit(child,depth+1);
+  });
+ }
+ visit(root,0);
+ return out;
+}
+
+function numericScore(root){
+ const objects=resultObjects(root);
+ const scoreKeys=[
+  "model_score","modelScore","risk_percentage","riskPercentage",
+  "probability_percentage","probabilityPercentage","risk_score","riskScore",
+  "score_percentage","scorePercentage","heart_disease_probability_percentage"
+ ];
+ for(const item of objects){
+  for(const key of scoreKeys){
+   const value=item[key];
+   if(value!==undefined&&value!==null&&value!==""&&Number.isFinite(Number(value))){
+    return Math.max(0,Math.min(100,Number(value)));
+   }
+  }
+ }
+ const probabilityKeys=[
+  "risk_probability","riskProbability","probability",
+  "heart_disease_probability","heartDiseaseProbability"
+ ];
+ for(const item of objects){
+  for(const key of probabilityKeys){
+   const value=item[key];
+   if(value!==undefined&&value!==null&&value!==""&&Number.isFinite(Number(value))){
+    const n=Number(value);
+    return Math.max(0,Math.min(100,n<=1?n*100:n));
+   }
+  }
+ }
+ return null;
+}
+
+function predictionLabel(root){
+ for(const item of resultObjects(root)){
+  const label=firstAvailable(
+   item.prediction_label,item.predictionLabel,item.predicted_class_label,
+   item.predictedClassLabel,item.risk_category,item.riskCategory,
+   item.class_name,item.className
+  );
+  if(typeof label==="string"&&label.trim())return label.trim();
+  const prediction=firstAvailable(item.prediction,item.predicted_class,item.predictedClass,item.class_label);
+  if(typeof prediction==="string"&&prediction.trim()&&!Number.isFinite(Number(prediction))){
+   return prediction.trim();
+  }
+ }
+ return null;
+}
+
+function getDate(...objects){
+ for(const root of objects){
+  for(const item of resultObjects(root)){
+   const value=firstAvailable(
+    item.assessment_date,item.assessmentDate,item.created_at,
+    item.createdAt,item.timestamp,item.date
+   );
+   if(value)return value;
+  }
+ }
+ return null;
+}
+
+function displayDate(value){
+ if(!value)return "Not recorded";
+ const date=new Date(value);
+ return Number.isNaN(date.getTime())?"Not recorded":
+  date.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
+}
+
+function getAge(){
+ for(const value of [currentAssessment.age,currentProfile.age]){
+  if(value!==undefined&&value!==null&&value!==""&&Number.isFinite(Number(value))){
+   return Number(value);
+  }
+ }
+ const dob=firstAvailable(
+  currentAssessment.dob,currentAssessment.date_of_birth,
+  currentProfile.dob,currentProfile.date_of_birth
+ );
+ if(dob){
+  const date=new Date(dob);
+  if(!Number.isNaN(date.getTime())){
+   const now=new Date();
+   return now.getFullYear()-date.getFullYear()-
+    (now.getMonth()<date.getMonth()||
+    (now.getMonth()===date.getMonth()&&now.getDate()<date.getDate())?1:0);
+  }
+ }
+ return null;
+}
+
+/* DISPLAY BANDS - ILLUSTRATIVE ONLY */
+function scoreBand(score){
+ if(score===null)return "none";
+ if(score<35)return "low";
+ if(score<70)return "middle";
+ return "high";
+}
+
+function bandInfo(band){
+ return {
+  low:{
+   title:"Lower display band",tag:"Lower prototype score",color:"#14877e",
+   description:"This lower display band does not rule out heart disease. Continue healthy habits and routine care.",
+   guide:"Maintain healthy habits and discuss routine screening with a healthcare professional when appropriate.",
+   image:"images/heart-low.png"
+  },
+  middle:{
+   title:"Middle display band",tag:"Middle prototype score",color:"#c58b35",
+   description:"Consider reviewing recorded measurements and health concerns with a healthcare professional.",
+   guide:"Discuss your health history and whether blood pressure, cholesterol or glucose checks are appropriate.",
+   image:"images/heart-moderate.png"
+  },
+  high:{
+   title:"Higher display band",tag:"Higher prototype score",color:"#c95d63",
+   description:"Arrange a prompt medical review. This experimental score cannot establish a diagnosis.",
+   guide:"Seek prompt medical evaluation. A clinician can assess symptoms, measurements and appropriate next steps.",
+   image:"images/heart-high.png"
+  },
+  none:{
+   title:"Prediction unavailable",tag:"No saved score",color:"#81919b",
+   description:"No numeric model score or probability was found in the saved result.",
+   guide:"Complete an assessment and confirm that your backend returns and saves the prediction output.",
+   image:""
+  }
+ }[band];
+}
+
+function renderScore(){
+ const score=currentScore;
+ const info=bandInfo(scoreBand(score));
+ const text=score===null?"—":Math.round(score)+"%";
+
+ $("statScore").textContent=text;
+ $("gaugeValue").textContent=text;
+ $("gaugeProgress").style.strokeDashoffset=score===null?314:314-score/100*314;
+ $("gaugeProgress").style.stroke=info.color;
+
+ const tag=$("scoreTag");
+ tag.textContent="● "+info.tag;
+ tag.style.color=info.color;
+ tag.style.background=info.color+"18";
+
+ $("scoreTitle").textContent=score===null?"Prediction score unavailable":info.title;
+ $("scoreDescription").textContent=score===null?
+  info.description+" Check the browser's saved result and your backend response.":
+  info.description+" This is not a clinically validated probability of having a heart attack.";
+
+ const action=$("scoreAction");
+ action.textContent=score===null?"Open assessment →":"Explore prevention guide ↓";
+ action.href=score===null?"assessment.html":"#prevention";
+
+ $("snapshotTitle").textContent=score===null?"No numeric score saved":info.title;
+ $("snapshotText").textContent=score===null?
+  "The dashboard cannot calculate a model prediction from health details alone. The assessment/backend must provide the prediction output.":
+  "Your saved experimental model output is "+Math.round(score)+"%. This is for education only, not a diagnosis.";
+
+ const target=$("preventionContent");
+ if(score===null){
+  target.innerHTML='<div class="empty">A numeric model score is unavailable. Please run an assessment and confirm the backend saves a score or probability. The dashboard will not infer a score from medical inputs.</div>';
+ }else{
+  target.innerHTML=`
+   <div class="prevention-top">
+    <div style="flex:1;min-width:0">
+     <span class="pill" style="color:${info.color};background:${info.color}18">${info.tag}</span>
+     <h3>${info.title} guide</h3><p>${info.guide}</p>
+    </div>
+    ${info.image?`<img src="${info.image}" alt="" style="width:76px;height:76px;object-fit:contain" onerror="this.style.display='none'">`:""}
+   </div>
+   <div class="prevention-grid">
+    <div class="prevention-tip"><span>🩺</span><h4>Review your health</h4><p>Discuss actual measurements, symptoms and family history with a qualified professional.</p></div>
+    <div class="prevention-tip"><span>🥦</span><h4>Healthy habits</h4><p>Choose balanced meals, avoid tobacco and build appropriate activity and sleep routines.</p></div>
+    <div class="prevention-tip"><span>💊</span><h4>Follow medical advice</h4><p>Use prescribed medicines as directed. Do not self-start aspirin or heart medicines.</p></div>
+   </div>`;
+ }
+}
+
+function renderHealthData(){
+ const target=$("healthData");
+ const items=combinedData(currentAssessment,currentProfile);
+ target.replaceChildren();
+ if(!items.length){
+  target.innerHTML='<div class="empty">No saved health details found.</div>';
+  return;
+ }
+ items.forEach(({key,value})=>{
+  const item=document.createElement("div");
+  item.className="data-item";
+  const label=document.createElement("div");
+  label.className="data-key";
+  label.textContent=labelFor(key);
+  const val=document.createElement("div");
+  val.className="data-val";
+  val.textContent=fmt(value);
+  item.append(label,val);
+  target.appendChild(item);
+ });
+}
+
+function getShapData(){
+ const keys=[
+  "shap_values","shapValues","feature_contributions","featureContributions",
+  "shap_contributions","contributions","individual_shap","individualShap"
+ ];
+ for(const source of resultObjects(currentResult)){
+  for(const key of keys){
+   const value=source[key];
+   if(Array.isArray(value)&&value.length)return value;
+   if(value&&typeof value==="object"&&!Array.isArray(value)){
+    const nested=value.values||value.contributions||value.feature_contributions;
+    if(Array.isArray(nested))return nested;
+    const entries=Object.entries(value);
+    if(entries.length&&entries.every(([,v])=>
+     typeof v==="number"||(v&&typeof v==="object"&&
+     Number.isFinite(Number(v.value??v.shap_value))))){
+     return entries.map(([feature,v])=>
+      typeof v==="number"?{feature,value:v}:{feature,...v});
+    }
+   }
+  }
+ }
+ return [];
+}
+
+function renderShap(){
+ const target=$("shapContent");
+ const rows=getShapData().map((item,i)=>{
+  if(typeof item==="number")return {feature:"Feature "+(i+1),value:item};
+  if(Array.isArray(item)&&item.length>=2){
+   return {feature:String(item[0]),value:Number(item[1])};
+  }
+  if(item&&typeof item==="object"){
+   const value=firstAvailable(item.value,item.shap_value,item.shapValue,item.contribution);
+   const feature=firstAvailable(item.feature,item.feature_name,item.featureName,item.name,"Feature "+(i+1));
+   if(value!==undefined&&Number.isFinite(Number(value))){
+    return {feature:String(feature),value:Number(value)};
+   }
+  }
+  return null;
+ }).filter(row=>row&&Number.isFinite(row.value));
+
+ $("statShap").textContent=rows.length;
+ target.replaceChildren();
+
+ if(!rows.length){
+  target.innerHTML='<div class="empty">Individual SHAP contributions are missing from the saved prediction. The backend must calculate and save genuine per-feature contributions.</div>';
+  return;
+ }
+
+ const note=document.createElement("p");
+ note.className="muted";
+ note.textContent="Positive values move the explained output upward; negative values move it downward. This describes model behavior, not causation.";
+ target.appendChild(note);
+
+ const list=document.createElement("div");
+ list.style.marginTop="14px";
+ target.appendChild(list);
+ const max=Math.max(...rows.map(row=>Math.abs(row.value)),0.000001);
+
+ rows.slice(0,12).forEach(row=>{
+  const line=document.createElement("div");
+  line.className="shap-row";
+  const name=document.createElement("div");
+  name.textContent=row.feature;
+  const track=document.createElement("div");
+  track.className="shap-track";
+  const bar=document.createElement("div");
+  bar.className="shap-bar";
+  bar.style.width=(Math.abs(row.value)/max*100)+"%";
+  bar.style.background=row.value>=0?"#c95d63":"#14877e";
+  track.appendChild(bar);
+  const value=document.createElement("div");
+  value.className="shap-value";
+  value.textContent=(row.value>0?"+":"")+row.value.toFixed(4);
+  line.append(name,track,value);
+  list.appendChild(line);
+ });
+}
+
+/* LOAD SAVED DASHBOARD DATA */
+function loadDashboard(){
+ currentResult=obj(readStorage(STORAGE_KEYS.result));
+ currentAssessment=obj(readStorage(STORAGE_KEYS.assessment));
+ currentProfile=obj(readStorage(STORAGE_KEYS.profile));
+ const legacy=obj(readStorage(STORAGE_KEYS.legacy));
+
+ if(!Object.keys(currentResult).length&&legacy.result&&typeof legacy.result==="object"){
+  currentResult=obj(legacy.result);
+ }
+ if(!Object.keys(currentAssessment).length&&legacy.assessment&&typeof legacy.assessment==="object"){
+  currentAssessment=obj(legacy.assessment);
+ }
+ if(!Object.keys(currentResult).length&&
+  ["model_score","risk_percentage","probability_percentage","risk_probability","probability","prediction_result","result"]
+  .some(key=>legacy[key]!==undefined)){
+  currentResult=legacy;
+ }
+
+ currentScore=numericScore(currentResult);
+ currentPredictionLabel=predictionLabel(currentResult);
+
+ $("statAge").textContent=getAge()??"—";
+ $("statDate").textContent=displayDate(getDate(currentResult,currentAssessment));
+
+ renderScore();
+ renderHealthData();
+ renderShap();
+ loadPlanner();
+}
+
+/* HABIT PLANNER */
+function updatePlanner(){
+ const activity=Number($("activity").value);
+ const sleep=Number($("sleep").value);
+ const water=Number($("water").value);
+
+ $("activityOut").textContent=activity+" min";
+ $("sleepOut").textContent=sleep+" hrs";
+ $("waterOut").textContent=water+" L";
+
+ const activityPercent=Math.min(100,activity/150*100);
+ const sleepPercent=Math.min(100,sleep/8*100);
+ const waterPercent=Math.min(100,water/2*100);
+
+ $("activityProgressText").textContent=activity+" min planned · "+Math.round(activityPercent)+"% of reference";
+ $("sleepProgressText").textContent=sleep+" hours planned · "+Math.round(sleepPercent)+"% of 8-hour reference";
+ $("waterProgressText").textContent=water+" litres planned · "+Math.round(waterPercent)+"% of 2-litre reference";
+
+ $("activityBar").style.width=activityPercent+"%";
+ $("sleepBar").style.width=sleepPercent+"%";
+ $("waterBar").style.width=waterPercent+"%";
+}
+
+function loadPlanner(){
+ const saved=obj(readStorage(STORAGE_KEYS.planner));
+
+ if(Number.isFinite(Number(saved.activity))&&saved.activity!==undefined){
+  $("activity").value=saved.activity;
+ }
+ if(Number.isFinite(Number(saved.sleep))&&saved.sleep!==undefined){
+  $("sleep").value=saved.sleep;
+ }
+ if(Number.isFinite(Number(saved.water))&&saved.water!==undefined){
+  $("water").value=saved.water;
+ }
+ updatePlanner();
+}
+
+["activity","sleep","water"].forEach(id=>{
+ $(id).addEventListener("input",()=>{
+  updatePlanner();
+  $("plannerMessage").textContent="Changes not saved yet. Select Save goals to keep them.";
+ });
+});
+
+$("savePlanner").addEventListener("click",()=>{
+ const planner={
+  activity:Number($("activity").value),
+  sleep:Number($("sleep").value),
+  water:Number($("water").value)
+ };
+ const saved=saveStorage(STORAGE_KEYS.planner,planner);
+ $("plannerMessage").textContent=saved?
+  "Your habit goals have been saved on this device.":
+  "Unable to save goals. Check your browser storage settings.";
+});
+
+$("resetPlanner").addEventListener("click",()=>{
+ $("activity").value=150;
+ $("sleep").value=8;
+ $("water").value=2;
+ updatePlanner();
+ $("plannerMessage").textContent="Default targets restored. Select Save goals to keep them.";
+});
+
+/* ======================================================
+   CARDIOSHIELD-AGELESS - SINGLE PDF EXPORT SECTION
+   ====================================================== */
+
+/* Load PDF library if it is not already available */
+async function ensurePdfLibrary() {
+    if (typeof window.html2pdf === "function") {
+        return true;
+    }
+
+    const urls = [
+        "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js",
+        "https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"
+    ];
+
+    for (const url of urls) {
+        try {
+            await new Promise((resolve, reject) => {
+                const script = document.createElement("script");
+                script.src = url;
+                script.async = true;
+
+                script.onload = resolve;
+
+                script.onerror = () => {
+                    script.remove();
+                    reject(new Error("PDF library loading failed."));
+                };
+
+                document.head.appendChild(script);
+            });
+
+            if (typeof window.html2pdf === "function") {
+                return true;
+            }
+
+        } catch (error) {
+            console.warn("PDF library loading failed:", error);
+        }
+    }
+
+    throw new Error(
+        "Unable to load PDF library. Check your internet connection."
+    );
+}
+
+
+/* Add PDF information row */
+function addPdfText(parent, label, value) {
+    const row = document.createElement("div");
+
+    row.style.cssText =
+        "display:flex;" +
+        "justify-content:space-between;" +
+        "gap:20px;" +
+        "padding:9px 0;" +
+        "border-bottom:1px solid #e5edf0;" +
+        "font-size:12px;" +
+        "line-height:1.6;";
+
+    const left = document.createElement("span");
+    left.textContent = String(label);
+
+    left.style.cssText =
+        "color:#687d88;" +
+        "font-weight:600;";
+
+    const right = document.createElement("strong");
+
+    right.textContent =
+        value === undefined || value === null || value === ""
+            ? "Not recorded"
+            : String(value);
+
+    right.style.cssText =
+        "color:#183344;" +
+        "text-align:right;" +
+        "max-width:60%;" +
+        "overflow-wrap:anywhere;";
+
+    row.append(left, right);
+    parent.appendChild(row);
+}
+
+
+/* Build PDF report */
+function buildPdfReport() {
+
+    const report = document.createElement("div");
+
+    report.id = "cardioshield-pdf-report";
+
+    Object.assign(report.style, {
+        position: "fixed",
+        top: "0",
+        left: "0",
+        width: "794px",
+        minHeight: "1123px",
+        padding: "40px",
+        boxSizing: "border-box",
+        display: "block",
+        visibility: "visible",
+        opacity: "1",
+        background: "#ffffff",
+        color: "#183344",
+        fontFamily: "Arial, Helvetica, sans-serif",
+        fontSize: "12px",
+        lineHeight: "1.6",
+        zIndex: "2147483647",
+        overflow: "visible",
+        margin: "0",
+        pointerEvents: "none"
+    });
+
+
+    /* HEADER */
+
+    const header = document.createElement("div");
+
+    header.style.cssText =
+        "text-align:center;" +
+        "border-bottom:3px solid #14877e;" +
+        "padding-bottom:18px;";
+
+    const brand = document.createElement("div");
+
+    brand.textContent = "CARDIOSHIELD-AGELESS";
+
+    brand.style.cssText =
+        "font-size:13px;" +
+        "font-weight:bold;" +
+        "letter-spacing:2px;" +
+        "color:#14877e;";
+
+    const title = document.createElement("h1");
+
+    title.textContent = "Health Prediction Report";
+
+    title.style.cssText =
+        "font-size:26px;" +
+        "margin:12px 0 5px;" +
+        "color:#102c3d;";
+
+    const subtitle = document.createElement("p");
+
+    subtitle.textContent =
+        "Explainable AI-Based Early Heart Risk Assessment";
+
+    subtitle.style.cssText =
+        "font-size:12px;" +
+        "color:#687d88;" +
+        "margin:0;";
+
+    header.append(brand, title, subtitle);
+
+    report.appendChild(header);
+
+
+    /* PREDICTION SUMMARY */
+
+    const prediction = document.createElement("section");
+
+    prediction.style.cssText =
+        "margin-top:25px;" +
+        "padding:24px;" +
+        "border:1px solid #e5edf0;" +
+        "border-radius:10px;" +
+        "text-align:center;";
+
+    const predictionLabel = document.createElement("div");
+
+    predictionLabel.textContent = "MODEL PREDICTION";
+
+    predictionLabel.style.cssText =
+        "font-size:11px;" +
+        "font-weight:bold;" +
+        "letter-spacing:1.4px;" +
+        "color:#81919b;";
+
+    prediction.appendChild(predictionLabel);
+
+    const scoreBandInfo = bandInfo(scoreBand(currentScore));
+
+    if (
+        currentScore !== null &&
+        Number.isFinite(Number(currentScore))
+    ) {
+
+        const score = document.createElement("div");
+
+        score.textContent =
+            Number(currentScore).toFixed(1) + "%";
+
+        score.style.cssText =
+            "font-size:44px;" +
+            "font-weight:bold;" +
+            "color:" + scoreBandInfo.color + ";" +
+            "margin:12px 0;";
+
+        prediction.appendChild(score);
+
+        const band = document.createElement("h2");
+
+        band.textContent =
+            currentPredictionLabel || scoreBandInfo.title;
+
+        band.style.cssText =
+            "font-size:18px;" +
+            "color:#183344;" +
+            "margin:4px 0;";
+
+        prediction.appendChild(band);
+
+    } else {
+
+        const label = document.createElement("h2");
+
+        label.textContent =
+            currentPredictionLabel || "Prediction unavailable";
+
+        label.style.cssText =
+            "font-size:20px;" +
+            "color:#14877e;" +
+            "margin:15px 0;";
+
+        prediction.appendChild(label);
+    }
+
+    report.appendChild(prediction);
+
+
+    /* ASSESSMENT DETAILS */
+
+    const details = document.createElement("section");
+
+    details.style.cssText =
+        "margin-top:22px;" +
+        "padding:18px;" +
+        "background:#f6f9fa;" +
+        "border:1px solid #e5edf0;" +
+        "border-radius:9px;";
+
+    const detailsHeading = document.createElement("h3");
+
+    detailsHeading.textContent = "Assessment Details";
+
+    detailsHeading.style.cssText =
+        "font-size:15px;" +
+        "margin:0 0 8px;" +
+        "color:#102c3d;";
+
+    details.appendChild(detailsHeading);
+
+    const age = getAge();
+
+    addPdfText(
+        details,
+        "Age",
+        age === null ? "Not recorded" : age
+    );
+
+    addPdfText(
+        details,
+        "Assessment Date",
+        displayDate(getDate(currentResult, currentAssessment))
+    );
+
+    addPdfText(
+        details,
+        "Prediction",
+        currentPredictionLabel || scoreBandInfo.title
+    );
+
+    addPdfText(
+        details,
+        "Model Score",
+        currentScore === null ||
+        !Number.isFinite(Number(currentScore))
+            ? "Not available"
+            : Number(currentScore).toFixed(2) + "%"
+    );
+
+    report.appendChild(details);
+
+
+    /* SAVED HEALTH INFORMATION */
+
+    const healthItems = combinedData(
+        currentAssessment,
+        currentProfile
+    );
+
+    if (Array.isArray(healthItems) && healthItems.length > 0) {
+
+        const health = document.createElement("section");
+
+        health.style.cssText = "margin-top:22px;";
+
+        const heading = document.createElement("h3");
+
+        heading.textContent = "Saved Health Information";
+
+        heading.style.cssText =
+            "font-size:15px;" +
+            "margin:0 0 8px;" +
+            "color:#102c3d;";
+
+        health.appendChild(heading);
+
+        healthItems.forEach(({ key, value }) => {
+
+            addPdfText(
+                health,
+                labelFor(key),
+                fmt(value)
+            );
+
+        });
+
+        report.appendChild(health);
+    }
+
+
+    /* SHAP EXPLANATION */
+
+    const shapData = getShapData();
+
+    const shapRows = Array.isArray(shapData)
+        ? shapData.map((item, index) => {
+
+            if (typeof item === "number") {
+
+                return {
+                    feature: "Feature " + (index + 1),
+                    value: item
+                };
+            }
+
+            if (Array.isArray(item) && item.length >= 2) {
+
+                return {
+                    feature: String(item[0]),
+                    value: Number(item[1])
+                };
+            }
+
+            if (item && typeof item === "object") {
+
+                const value = firstAvailable(
+                    item.value,
+                    item.shap_value,
+                    item.shapValue,
+                    item.contribution
+                );
+
+                const feature = firstAvailable(
+                    item.feature,
+                    item.feature_name,
+                    item.featureName,
+                    item.name,
+                    "Feature " + (index + 1)
+                );
+
+                if (
+                    value !== undefined &&
+                    Number.isFinite(Number(value))
+                ) {
+
+                    return {
+                        feature: String(feature),
+                        value: Number(value)
+                    };
+                }
+            }
+
+            return null;
+
+        }).filter(item =>
+            item && Number.isFinite(item.value)
+        )
+        : [];
+
+    if (shapRows.length > 0) {
+
+        const shap = document.createElement("section");
+
+        shap.style.cssText = "margin-top:22px;";
+
+        const heading = document.createElement("h3");
+
+        heading.textContent =
+            "Individual SHAP Contributions";
+
+        heading.style.cssText =
+            "font-size:15px;" +
+            "margin:0 0 8px;" +
+            "color:#102c3d;";
+
+        shap.appendChild(heading);
+
+        shapRows.slice(0, 12).forEach(item => {
+
+            addPdfText(
+                shap,
+                item.feature,
+                (item.value > 0 ? "+" : "") +
+                item.value.toFixed(4)
+            );
+
+        });
+
+        report.appendChild(shap);
+    }
+
+
+    /* RESULT EXPLANATION */
+
+    const explanation = document.createElement("section");
+
+    explanation.style.cssText =
+        "margin-top:22px;" +
+        "padding:16px;" +
+        "background:#f0f8f6;" +
+        "border-left:4px solid #14877e;" +
+        "border-radius:5px;";
+
+    const explanationHeading = document.createElement("h3");
+
+    explanationHeading.textContent = "About This Result";
+
+    explanationHeading.style.cssText =
+        "font-size:14px;" +
+        "margin:0 0 7px;" +
+        "color:#183344;";
+
+    const explanationText = document.createElement("p");
+
+    explanationText.textContent =
+        "This report displays the experimental model output saved by " +
+        "the CardioShield-AgeLess assessment system. The score is not a " +
+        "clinically validated probability of having a heart attack.";
+
+    explanationText.style.cssText =
+        "font-size:11px;" +
+        "line-height:1.7;" +
+        "margin:0;" +
+        "color:#405965;";
+
+    explanation.append(
+        explanationHeading,
+        explanationText
+    );
+
+    report.appendChild(explanation);
+
+
+    /* MEDICAL DISCLAIMER */
+
+    const disclaimer = document.createElement("section");
+
+    disclaimer.style.cssText =
+        "margin-top:18px;" +
+        "padding:15px;" +
+        "background:#fff8ee;" +
+        "border-left:4px solid #c58b35;" +
+        "border-radius:5px;";
+
+    const disclaimerHeading = document.createElement("h3");
+
+    disclaimerHeading.textContent =
+        "Important Medical Disclaimer";
+
+    disclaimerHeading.style.cssText =
+        "font-size:13px;" +
+        "margin:0 0 7px;" +
+        "color:#183344;";
+
+    const disclaimerText = document.createElement("p");
+
+    disclaimerText.textContent =
+        "CardioShield-AgeLess is an educational prototype, not a medical " +
+        "diagnosis. Its score bands are illustrative and not clinically " +
+        "validated. A low score cannot rule out heart disease. Consult a " +
+        "qualified healthcare professional for medical assessment. If you " +
+        "suspect a heart attack, seek emergency care immediately.";
+
+    disclaimerText.style.cssText =
+        "font-size:10px;" +
+        "line-height:1.7;" +
+        "margin:0;" +
+        "color:#687d88;";
+
+    disclaimer.append(
+        disclaimerHeading,
+        disclaimerText
+    );
+
+    report.appendChild(disclaimer);
+
+
+    /* FOOTER */
+
+    const footer = document.createElement("div");
+
+    footer.textContent =
+        "CardioShield-AgeLess | AI & Data Science Major Project";
+
+    footer.style.cssText =
+        "margin-top:28px;" +
+        "padding-top:12px;" +
+        "border-top:1px solid #e5edf0;" +
+        "text-align:center;" +
+        "color:#81919b;" +
+        "font-size:10px;";
+
+    report.appendChild(footer);
+
+    return report;
+}
+/* ======================================================
+   CARDIOSHIELD-AGELESS - PDF EXPORT
+   BROWSER PRINT METHOD
+   ====================================================== */
+
+const exportPdfButton = $("exportPdf");
+
+if (exportPdfButton) {
+
+    exportPdfButton.addEventListener("click", function () {
+
+        const button = this;
+        const originalText = button.textContent;
+
+        let report = null;
+        let printStyle = null;
+        let cleaned = false;
+
+        /* CLEANUP FUNCTION */
+
+        function cleanup() {
+
+            if (cleaned) return;
+            cleaned = true;
+
+            if (report && report.parentNode) {
+                report.parentNode.removeChild(report);
+            }
+
+            if (printStyle && printStyle.parentNode) {
+                printStyle.parentNode.removeChild(printStyle);
+            }
+
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+
+        try {
+
+            button.disabled = true;
+            button.textContent = "Preparing PDF...";
+
+            /* REFRESH DASHBOARD DATA */
+
+            if (typeof loadDashboard === "function") {
+                loadDashboard();
+            }
+
+            /* CHECK SAVED PREDICTION */
+
+            if (
+                currentScore === null ||
+                !Number.isFinite(Number(currentScore))
+            ) {
+                throw new Error(
+                    "No valid saved prediction found. Complete an assessment first."
+                );
+            }
+
+            /* BUILD PDF REPORT */
+
+            report = buildPdfReport();
+
+            if (!report) {
+                throw new Error("Unable to create the PDF report.");
+            }
+
+            /* APPEND REPORT TO PAGE */
+
+            document.body.appendChild(report);
+
+            /* PRINT STYLES */
+
+            printStyle = document.createElement("style");
+
+            printStyle.id = "cardioshield-print-style";
+
+            printStyle.textContent = `
+
+                @page {
+                    size: A4;
+                    margin: 10mm;
+                }
+
+                @media print {
+
+                    html,
+                    body {
+                        background: #ffffff !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                        height: auto !important;
+                        overflow: visible !important;
+                    }
+
+                    body * {
+                        visibility: hidden !important;
+                    }
+
+                    #cardioshield-pdf-report,
+                    #cardioshield-pdf-report * {
+                        visibility: visible !important;
+                    }
+
+                    #cardioshield-pdf-report {
+
+                        display: block !important;
+
+                        position: absolute !important;
+
+                        top: 0 !important;
+                        left: 0 !important;
+
+                        width: 190mm !important;
+                        max-width: none !important;
+
+                        min-height: 0 !important;
+
+                        margin: 0 !important;
+                        padding: 5mm !important;
+
+                        box-sizing: border-box !important;
+
+                        background: #ffffff !important;
+                        color: #183344 !important;
+
+                        opacity: 1 !important;
+
+                        overflow: visible !important;
+
+                        z-index: 999999 !important;
+
+                        page-break-inside: auto;
+                    }
+
+                    #cardioshield-pdf-report section,
+                    #cardioshield-pdf-report h2,
+                    #cardioshield-pdf-report p {
+                        break-inside: avoid;
+                        page-break-inside: avoid;
+                    }
+
+                }
+            `;
+
+            document.head.appendChild(printStyle);
+
+            /* WAIT FOR REPORT TO RENDER */
+
+            requestAnimationFrame(() => {
+
+                requestAnimationFrame(() => {
+
+                    if (!report || !report.isConnected) {
+                        cleanup();
+                        alert("PDF report could not be displayed.");
+                        return;
+                    }
+
+                    /* RESTORE AFTER PRINT OR CANCEL */
+
+                    window.addEventListener(
+                        "afterprint",
+                        cleanup,
+                        { once: true }
+                    );
+
+                    /* OPEN PRINT DIALOG */
+
+                    window.print();
+
+                });
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "CardioShield PDF export error:",
+                error
+            );
+
+            alert(
+                "PDF export failed:\n\n" +
+                (error.message || String(error))
+            );
+
+            cleanup();
+        }
+
+    });
+}
+
+/* ======================================================
+   END OF PDF EXPORT SECTION
+   ====================================================== */
+
+/* CLEAR ASSESSMENT AND PREDICTION ONLY */
+$("clearData").addEventListener("click",()=>{
+ if(!confirm("Clear the saved assessment and result? Your profile and habit planner will be kept."))return;
+
+ localStorage.removeItem(STORAGE_KEYS.result);
+ localStorage.removeItem(STORAGE_KEYS.assessment);
+
+ const legacy=obj(readStorage(STORAGE_KEYS.legacy));
+
+ [
+  "result","assessment","prediction_result","predictionResult",
+  "model_score","modelScore","risk_percentage","riskPercentage",
+  "probability_percentage","probabilityPercentage","risk_probability",
+  "riskProbability","probability","risk_score","riskScore"
+ ].forEach(key=>delete legacy[key]);
+
+ if(Object.keys(legacy).length){
+  saveStorage(STORAGE_KEYS.legacy,legacy);
+ }else{
+  localStorage.removeItem(STORAGE_KEYS.legacy);
+ }
+
+ loadDashboard();
+});
+
+/* NAVIGATION ACTIVE STATE */
+document.querySelectorAll(".nav a").forEach(link=>{
+ link.addEventListener("click",()=>{
+  document.querySelectorAll(".nav a").forEach(item=>item.classList.remove("active"));
+  link.classList.add("active");
+ });
+});
+
+/* REFRESH WHEN ANOTHER TAB SAVES A NEW ASSESSMENT */
+window.addEventListener("storage",event=>{
+ if(Object.values(STORAGE_KEYS).includes(event.key)){
+  loadDashboard();
+ }
+});
+
+/* START DASHBOARD */
+loadDashboard();
+
+</script>
+</body>
+</html>

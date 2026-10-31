@@ -1,0 +1,69 @@
+# Data_Description.txt
+
+The following content describes the structure, metadata, and clinical annotations (or lack thereof) associated with the dataset, as required in the Data Description section of the PhysioNet submission.
+
+### Data Description
+This dataset contains myocardial perfusion scintigraphy (MPS) images from 83 unique patients, acquired using a CZT-based gamma camera (Discovery NM 530c, GE Healthcare). All images were obtained under rest-only protocols using a standardized one-day acquisition procedure with 99mTc-MIBI. The dataset is anonymized and includes two image formats: DICOM (original input) and NIfTI (preprocessed volumes and segmentation masks, when available).
+
+### Metadata
+Basic demographic metadata are provided in a CSV file named demographics.csv, which includes the following columns:
+
+patient_id (pseudonymized and matching image folder IDs)
+
+sex (M/F)
+
+age (in years)
+
+BMI (when available)
+
+Each row corresponds to a single study and is linked to the image files by the patient_id. No personally identifiable information is included. These demographic attributes were extracted from REDCap records and harmonized with anonymized DICOM tags.
+
+In addition to demographic information, technical metadata were extracted from DICOM headers and are consistent across all studies in the dataset. The acquisition protocol is standardized. A representative exam is used to illustrate the typical metadata fields found across all studies:
+
+Modality: NM (Nuclear Medicine)
+
+Manufacturer: GE Medical Systems
+
+Scanner model: Discovery NM 530c
+
+Collimator type: Pinhole (MPH_27_45)
+
+Radiopharmaceutical: 99mTc-MIBI
+
+Energy window: 126.45–154.55 keV
+
+Patient position: Supine, feet-first
+
+Image resolution: 70×70 pixels, with 4.0×4.0 mm² pixel spacing
+
+Slice thickness: 4.0 mm, 50 slices per volume
+
+Photometric interpretation: MONOCHROME2
+
+Bit depth: 16-bit (Bits Allocated: 16; Pixel Representation: signed)
+
+Window center/width: 16383 / 32767
+
+Spatial resolution: 5 mm (as reported)
+
+Software version: VNA-NORMATIZADOR v0.1.0
+
+Deidentification protocol: Basic Application Confidentiality Profile (DICOM codes 113100, 113101, 113107)
+
+These metadata specifications are identical across all 101 studies and their corresponding 103 DICOM images. The discrepancy between the number of DICOM and NIfTI files arises because two studies were not segmented, resulting in 101 NIfTI volumes (with masks) and 103 original DICOM files. All NIfTI files were generated directly from the DICOM images using a standardized preprocessing pipeline.
+
+Clinical reports are not included, in accordance with anonymity protocols and institutional constraints. A Python script (`extract_dicom_metadata.py`) is provided for reproducibility and further exploration. The current `demographics.csv` file was generated from a single representative DICOM exam using this script. All other exams follow an identical DICOM structure and acquisition protocol, ensuring consistency across the dataset.
+
+
+### Descriptive Statistics
+Total studies: 83
+
+Sex distribution: 88% male, 12% female
+
+Age range: 20 to 90 years
+
+Diagnosis labels: Not provided
+
+Confirmed ischemia/necrosis: Not labeled or quantified in this release
+
+This dataset is intended to support research in segmentation and preprocessing techniques in nuclear cardiology. Future releases may include artifact annotations or diagnostic labels, pending ethical approval and enhanced anonymization protocols.

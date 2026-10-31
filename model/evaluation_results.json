@@ -1,0 +1,63 @@
+{
+    "dataset": "cardioshield_combined_heart_disease.csv",
+    "target": "heart_disease",
+    "features": [
+        "age",
+        "sex",
+        "chest_pain_type",
+        "resting_bp",
+        "cholesterol",
+        "fasting_blood_sugar",
+        "resting_ecg",
+        "max_heart_rate",
+        "exercise_induced_angina",
+        "oldpeak",
+        "st_slope",
+        "ca",
+        "thal"
+    ],
+    "train_samples": 734,
+    "test_samples": 184,
+    "accuracy": 0.8207,
+    "precision": 0.8224,
+    "recall": 0.8627,
+    "f1_score": 0.8421,
+    "roc_auc": 0.9006,
+    "confusion_matrix": [
+        [
+            63,
+            19
+        ],
+        [
+            14,
+            88
+        ]
+    ],
+    "classification_report": {
+        "0": {
+            "precision": 0.8181818181818182,
+            "recall": 0.7682926829268293,
+            "f1-score": 0.7924528301886793,
+            "support": 82.0
+        },
+        "1": {
+            "precision": 0.822429906542056,
+            "recall": 0.8627450980392157,
+            "f1-score": 0.8421052631578947,
+            "support": 102.0
+        },
+        "accuracy": 0.8206521739130435,
+        "macro avg": {
+            "precision": 0.8203058623619371,
+            "recall": 0.8155188904830225,
+            "f1-score": 0.817279046673287,
+            "support": 184.0
+        },
+        "weighted avg": {
+            "precision": 0.8205367367293414,
+            "recall": 0.8206521739130435,
+            "f1-score": 0.8199775484650921,
+            "support": 184.0
+        }
+    }
+}

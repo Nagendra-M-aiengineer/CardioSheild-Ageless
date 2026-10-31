@@ -1,0 +1,16 @@
+column,description
+age,Age in years
+sex,Sex coded as in the original UCI dataset
+chest_pain_type,Chest pain type coded as in the original UCI dataset
+resting_bp,Resting blood pressure
+cholesterol,Serum cholesterol
+fasting_blood_sugar,Fasting blood sugar indicator
+resting_ecg,Resting electrocardiographic result
+max_heart_rate,Maximum heart rate achieved
+exercise_induced_angina,Exercise-induced angina indicator
+oldpeak,ST depression induced by exercise
+st_slope,Slope of the peak exercise ST segment
+ca,Number of major vessels colored by fluoroscopy
+thal,Thalassemia-related categorical code
+heart_disease,"Binary target: 0 = no heart disease, 1 = heart disease present"
+source_dataset,Original processed UCI source dataset

@@ -1,0 +1,930 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f6faf9">
+
+    <title>My Profile | CardioShield-AgeLess</title>
+
+    <link rel="stylesheet" href="./styles.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+        .profile-page {
+            width: min(1000px, calc(100% - 40px));
+            margin: 42px auto 65px;
+        }
+
+        .profile-intro {
+            margin-bottom: 28px;
+        }
+
+        .profile-intro h1 {
+            margin-bottom: 9px;
+            color: var(--navy);
+            font-size: clamp(30px, 4vw, 40px);
+            font-weight: 800;
+            letter-spacing: -1.2px;
+            line-height: 1.25;
+        }
+
+        .profile-intro p {
+            max-width: 650px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.9;
+        }
+
+        .profile-banner {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 25px;
+            padding: 30px;
+
+            display: flex;
+            align-items: center;
+            gap: 22px;
+
+            color: white;
+            background:
+                radial-gradient(
+                    circle at 90% 0%,
+                    rgba(66, 200, 181, .27),
+                    transparent 17rem
+                ),
+                linear-gradient(125deg, #102d42, #075766 70%, #087f8c);
+
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-avatar {
+            width: 82px;
+            height: 82px;
+            flex: 0 0 82px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: var(--primary-dark);
+            background: #e8fbf7;
+            border: 4px solid rgba(255, 255, 255, .28);
+            border-radius: 24px;
+
+            font-size: 32px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .profile-banner h2 {
+            margin-bottom: 4px;
+            color: #ffffff;
+            font-size: 23px;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+        }
+
+        .profile-banner .profile-email {
+            margin-bottom: 8px;
+            color: #d8f0ee;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .member-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 10px;
+
+            color: #d6faf2;
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .17);
+            border-radius: 30px;
+
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .member-label span {
+            width: 6px;
+            height: 6px;
+            background: #69e1c2;
+            border-radius: 50%;
+        }
+
+        .profile-message {
+            display: none;
+            margin-bottom: 22px;
+            padding: 15px 17px;
+
+            color: #176a55;
+            background: #e7f7f0;
+            border: 1px solid #ccebdc;
+            border-radius: 12px;
+
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .profile-message.error {
+            color: #a82f49;
+            background: #fff0f3;
+            border-color: #f4d0d9;
+        }
+
+        .profile-card {
+            margin-bottom: 21px;
+            padding: 28px;
+
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .profile-card-heading {
+            margin-bottom: 23px;
+            padding-bottom: 17px;
+
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+
+            border-bottom: 1px solid #eaf1ef;
+        }
+
+        .profile-card-icon {
+            width: 42px;
+            height: 42px;
+            flex: 0 0 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: var(--primary);
+            background: var(--primary-light);
+            border-radius: 13px;
+
+            font-size: 20px;
+        }
+
+        .profile-card-heading h2 {
+            margin-bottom: 4px;
+            color: var(--navy);
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+
+        .profile-card-heading p {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.8;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 21px;
+        }
+
+        .profile-field {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .profile-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .profile-field label {
+            color: var(--text-dark);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .profile-field input,
+        .profile-field select,
+        .profile-field textarea {
+            width: 100%;
+            min-height: 46px;
+            padding: 12px 13px;
+
+            color: var(--text-dark);
+            background: #fbfdfc;
+            border: 1px solid var(--border-strong);
+            border-radius: 10px;
+
+            font-size: 12px;
+            line-height: 1.6;
+
+            transition:
+                border-color 180ms ease,
+                box-shadow 180ms ease,
+                background 180ms ease;
+        }
+
+        .profile-field input:focus,
+        .profile-field select:focus,
+        .profile-field textarea:focus {
+            outline: none;
+            background: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(8, 127, 140, .1);
+        }
+
+        .profile-field textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .profile-field input::placeholder,
+        .profile-field textarea::placeholder {
+            color: #91a3aa;
+        }
+
+        .profile-field .field-hint {
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        .required-mark {
+            color: var(--danger);
+        }
+
+        .profile-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 11px;
+            margin-top: 24px;
+        }
+
+        .profile-actions button {
+            font-family: inherit;
+        }
+
+        .profile-clear-button {
+            min-height: 46px;
+            padding: 12px 16px;
+
+            color: #a9384d;
+            background: var(--danger-soft);
+            border: 1px solid #f3d4dc;
+            border-radius: 11px;
+
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+
+            transition: background 180ms ease;
+        }
+
+        .profile-clear-button:hover {
+            background: #ffe3e9;
+        }
+
+        .profile-privacy-note {
+            margin-top: 20px;
+            padding: 17px 19px;
+
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+
+            color: #647e87;
+            background: #eef7f5;
+            border: 1px solid #dcece8;
+            border-radius: 13px;
+
+            font-size: 11px;
+            line-height: 1.9;
+        }
+
+        .profile-privacy-note strong {
+            color: var(--navy);
+        }
+
+        .profile-privacy-icon {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        @media (max-width: 760px) {
+            .profile-page {
+                margin-top: 30px;
+            }
+
+            .profile-banner {
+                padding: 24px;
+            }
+
+            .profile-card {
+                padding: 23px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .profile-page {
+                width: calc(100% - 30px);
+                margin-top: 25px;
+            }
+
+            .profile-banner {
+                padding: 20px;
+                align-items: flex-start;
+                gap: 15px;
+                border-radius: 19px;
+            }
+
+            .profile-avatar {
+                width: 58px;
+                height: 58px;
+                flex-basis: 58px;
+                border-radius: 17px;
+                font-size: 24px;
+            }
+
+            .profile-banner h2 {
+                font-size: 19px;
+            }
+
+            .profile-card {
+                padding: 19px;
+                border-radius: 16px;
+            }
+
+            .profile-grid {
+                grid-template-columns: minmax(0, 1fr);
+                gap: 17px;
+            }
+
+            .profile-field.full {
+                grid-column: auto;
+            }
+
+            .profile-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .profile-actions button,
+            .profile-actions a {
+                width: 100%;
+            }
+
+            .profile-privacy-note {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+    <header class="navbar">
+        <a href="index.html#home" class="brand">
+            <span class="brand-icon" aria-hidden="true">♥</span>
+            <span>CardioShield<span class="brand-light">-AgeLess</span></span>
+        </a>
+
+        <button
+            class="menu-toggle"
+            id="menuToggle"
+            type="button"
+            aria-label="Toggle navigation"
+            aria-controls="navLinks"
+            aria-expanded="false"
+        >
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+            <a href="index.html">Home</a>
+            <a href="assessment.html">Assessment</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="profile.html" aria-current="page">My Profile</a>
+            <a href="assessment.html" class="nav-button">Start Assessment →</a>
+        </nav>
+    </header>
+
+
+    <main class="profile-page">
+
+        <header class="profile-intro">
+            <span class="eyebrow">YOUR PERSONAL SPACE</span>
+            <h1>My Profile</h1>
+            <p>
+                Manage your personal information, optional health details
+                and preferences for your CardioShield-AgeLess experience.
+            </p>
+        </header>
+
+
+        <!-- PROFILE SUMMARY -->
+        <section class="profile-banner" aria-label="Profile summary">
+            <div class="profile-avatar" id="avatar" aria-hidden="true">U</div>
+
+            <div>
+                <h2 id="displayName">Your Name</h2>
+                <p class="profile-email" id="displayEmail">No email added</p>
+
+                <span class="member-label">
+                    <span aria-hidden="true"></span>
+                    CardioShield-AgeLess Member
+                </span>
+            </div>
+        </section>
+
+
+        <div
+            class="profile-message"
+            id="successMessage"
+            role="status"
+            aria-live="polite"
+        ></div>
+
+
+        <form id="profileForm">
+
+            <!-- PERSONAL INFORMATION -->
+            <section class="profile-card">
+                <div class="profile-card-heading">
+                    <div class="profile-card-icon" aria-hidden="true">♙</div>
+                    <div>
+                        <h2>Personal Information</h2>
+                        <p>Basic information for your profile.</p>
+                    </div>
+                </div>
+
+                <div class="profile-grid">
+
+                    <div class="profile-field">
+                        <label for="fullName">
+                            Full Name <span class="required-mark">*</span>
+                        </label>
+                        <input
+                            id="fullName"
+                            name="fullName"
+                            type="text"
+                            maxlength="100"
+                            autocomplete="name"
+                            placeholder="Enter your full name"
+                            required
+                        >
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="email">Email Address</label>
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            maxlength="150"
+                            autocomplete="email"
+                            placeholder="you@example.com"
+                        >
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="phone">Phone Number</label>
+                        <input
+                            id="phone"
+                            name="phone"
+                            type="tel"
+                            maxlength="20"
+                            autocomplete="tel"
+                            placeholder="Enter phone number"
+                        >
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="dateOfBirth">Date of Birth</label>
+                        <input
+                            id="dateOfBirth"
+                            name="dateOfBirth"
+                            type="date"
+                            autocomplete="bday"
+                        >
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="gender">Gender (optional)</label>
+                        <select id="gender" name="gender">
+                            <option value="">Prefer not to say</option>
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="occupation">Occupation</label>
+                        <input
+                            id="occupation"
+                            name="occupation"
+                            type="text"
+                            maxlength="100"
+                            placeholder="Enter occupation"
+                        >
+                    </div>
+
+                    <div class="profile-field full">
+                        <label for="address">Address (optional)</label>
+                        <textarea
+                            id="address"
+                            name="address"
+                            maxlength="500"
+                            autocomplete="street-address"
+                            placeholder="Enter address if you wish"
+                        ></textarea>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- HEALTH INFORMATION -->
+            <section class="profile-card">
+                <div class="profile-card-heading">
+                    <div class="profile-card-icon" aria-hidden="true">♥</div>
+                    <div>
+                        <h2>Health Information</h2>
+                        <p>Optional details that may help prefill supported assessment fields.</p>
+                    </div>
+                </div>
+
+                <p class="field-hint" style="margin-bottom: 20px;">
+                    Enter only information you know. These profile fields
+                    are not a diagnosis, and any clinical measurements
+                    should be taken from reliable records.
+                </p>
+
+                <div class="profile-grid">
+
+                    <div class="profile-field">
+                        <label for="height">Height (cm)</label>
+                        <input
+                            id="height"
+                            name="height"
+                            type="number"
+                            min="50"
+                            max="250"
+                            step="0.1"
+                            placeholder="e.g. 170"
+                        >
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="weight">Weight (kg)</label>
+                        <input
+                            id="weight"
+                            name="weight"
+                            type="number"
+                            min="2"
+                            max="500"
+                            step="0.1"
+                            placeholder="e.g. 65"
+                        >
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="activity">Physical Activity</label>
+                        <select id="activity" name="activity">
+                            <option value="">Select an option</option>
+                            <option value="Low">Low</option>
+                            <option value="Moderate">Moderate</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="sleep">Typical Sleep (hours)</label>
+                        <input
+                            id="sleep"
+                            name="sleep"
+                            type="number"
+                            min="0"
+                            max="24"
+                            step="0.5"
+                            placeholder="e.g. 7.5"
+                        >
+                    </div>
+
+                    <div class="profile-field full">
+                        <label for="healthNotes">Personal Health Notes (optional)</label>
+                        <textarea
+                            id="healthNotes"
+                            name="healthNotes"
+                            maxlength="1000"
+                            placeholder="Optional notes for your own reference"
+                        ></textarea>
+                        <p class="field-hint">
+                            Avoid entering information you do not want stored
+                            in this browser. These notes are not verified
+                            medical records.
+                        </p>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- PREFERENCES -->
+            <section class="profile-card">
+                <div class="profile-card-heading">
+                    <div class="profile-card-icon" aria-hidden="true">⚙</div>
+                    <div>
+                        <h2>Preferences</h2>
+                        <p>Choose how you prefer to use the prototype.</p>
+                    </div>
+                </div>
+
+                <div class="profile-grid">
+
+                    <div class="profile-field">
+                        <label for="reminders">Health Reminders</label>
+                        <select id="reminders" name="reminders">
+                            <option value="Off">Off</option>
+                            <option value="On">On</option>
+                        </select>
+                        <p class="field-hint">
+                            This preference does not enable notifications
+                            in the current prototype.
+                        </p>
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="units">Measurement Units</label>
+                        <select id="units" name="units">
+                            <option value="Metric">Metric (cm, kg)</option>
+                            <option value="Imperial">Imperial (ft/in, lb)</option>
+                        </select>
+                        <p class="field-hint">
+                            The profile stores this preference; it does
+                            not automatically convert every assessment field.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="profile-actions">
+                    <button class="primary-button" type="submit">
+                        Save Profile <span aria-hidden="true">✓</span>
+                    </button>
+
+                    <button class="secondary-button" type="reset">
+                        Reset Form
+                    </button>
+
+                    <button
+                        class="profile-clear-button"
+                        type="button"
+                        id="deleteProfile"
+                    >
+                        Clear Saved Profile
+                    </button>
+                </div>
+            </section>
+
+        </form>
+
+
+        <aside class="profile-privacy-note">
+            <span class="profile-privacy-icon" aria-hidden="true">ⓘ</span>
+            <p>
+                <strong>About your information:</strong>
+                this page stores the profile in your browser's localStorage.
+                It is not an encrypted medical-record system. Clearing
+                browser data can remove the saved profile. Only enter
+                information you are comfortable keeping on this device.
+            </p>
+        </aside>
+
+    </main>
+
+
+    <footer class="footer">
+        <div class="footer-bottom">
+            <span>
+                © <span id="currentYear"></span> CardioShield-AgeLess
+            </span>
+            <a href="index.html">Back to Home ↑</a>
+        </div>
+    </footer>
+
+
+    <script>
+        "use strict";
+
+        const STORAGE_KEY = "cardioshieldUserProfile";
+
+        const form = document.getElementById("profileForm");
+        const successMessage = document.getElementById("successMessage");
+
+        const fieldNames = [
+            "fullName",
+            "email",
+            "phone",
+            "dateOfBirth",
+            "gender",
+            "occupation",
+            "address",
+            "height",
+            "weight",
+            "activity",
+            "sleep",
+            "healthNotes",
+            "reminders",
+            "units"
+        ];
+
+        function getProfile() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                return saved ? JSON.parse(saved) || {} : {};
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function updateHeader() {
+            const name = document.getElementById("fullName").value.trim();
+            const email = document.getElementById("email").value.trim();
+
+            document.getElementById("displayName").textContent =
+                name || "Your Name";
+
+            document.getElementById("displayEmail").textContent =
+                email || "No email added";
+
+            document.getElementById("avatar").textContent =
+                name ? name.charAt(0).toUpperCase() : "U";
+        }
+
+        function showMessage(message, isError) {
+            successMessage.textContent = message;
+            successMessage.classList.toggle("error", Boolean(isError));
+            successMessage.style.display = "block";
+        }
+
+        function hideMessage() {
+            successMessage.style.display = "none";
+            successMessage.classList.remove("error");
+        }
+
+        function loadProfile() {
+            const profile = getProfile();
+
+            fieldNames.forEach(function (fieldName) {
+                const field = document.getElementById(fieldName);
+
+                if (field && profile[fieldName] !== undefined &&
+                    profile[fieldName] !== null) {
+                    field.value = String(profile[fieldName]);
+                }
+            });
+
+            updateHeader();
+        }
+
+        function collectProfile() {
+            const profile = {};
+
+            fieldNames.forEach(function (fieldName) {
+                const field = document.getElementById(fieldName);
+                profile[fieldName] = field ? field.value.trim() : "";
+            });
+
+            return profile;
+        }
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            if (!form.reportValidity()) {
+                return;
+            }
+
+            const profile = collectProfile();
+
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+
+                updateHeader();
+                showMessage("Your profile has been saved successfully.", false);
+
+                successMessage.scrollIntoView({
+                    behavior: window.matchMedia(
+                        "(prefers-reduced-motion: reduce)"
+                    ).matches ? "auto" : "smooth",
+                    block: "nearest"
+                });
+            } catch (error) {
+                showMessage(
+                    "The profile could not be saved. Check your browser's storage settings.",
+                    true
+                );
+            }
+        });
+
+        form.addEventListener("input", function () {
+            hideMessage();
+            updateHeader();
+        });
+
+        form.addEventListener("change", function () {
+            hideMessage();
+            updateHeader();
+        });
+
+        form.addEventListener("reset", function () {
+            window.setTimeout(function () {
+                updateHeader();
+                hideMessage();
+            }, 0);
+        });
+
+        document.getElementById("deleteProfile").addEventListener(
+            "click",
+            function () {
+                const confirmed = window.confirm(
+                    "Clear the saved CardioShield-AgeLess profile from this browser? This will not delete assessment results."
+                );
+
+                if (!confirmed) {
+                    return;
+                }
+
+                try {
+                    localStorage.removeItem(STORAGE_KEY);
+                    form.reset();
+                    loadProfile();
+
+                    showMessage("The saved profile has been cleared.", false);
+                } catch (error) {
+                    showMessage(
+                        "The saved profile could not be cleared. Check your browser storage settings.",
+                        true
+                    );
+                }
+            }
+        );
+
+        // Mobile navigation
+        const menuToggle = document.getElementById("menuToggle");
+        const navLinks = document.getElementById("navLinks");
+
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener("click", function () {
+                const isOpen = navLinks.classList.toggle("nav-open");
+                menuToggle.setAttribute("aria-expanded", String(isOpen));
+            });
+
+            navLinks.querySelectorAll("a").forEach(function (link) {
+                link.addEventListener("click", function () {
+                    navLinks.classList.remove("nav-open");
+                    menuToggle.setAttribute("aria-expanded", "false");
+                });
+            });
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") {
+                    navLinks.classList.remove("nav-open");
+                    menuToggle.setAttribute("aria-expanded", "false");
+                }
+            });
+
+            window.addEventListener("resize", function () {
+                if (window.innerWidth > 760) {
+                    navLinks.classList.remove("nav-open");
+                    menuToggle.setAttribute("aria-expanded", "false");
+                }
+            });
+        }
+
+        document.getElementById("currentYear").textContent =
+            new Date().getFullYear();
+
+        loadProfile();
+    </script>
+
+</body>
+</html>

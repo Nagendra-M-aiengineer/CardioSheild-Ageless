@@ -1,0 +1,26 @@
+CardioShield-AgeLess Model Evaluation
+=============================================
+
+Selected model: Random Forest
+Target: heart_disease
+Input features: age, sex, chest_pain_type, resting_bp, cholesterol, fasting_blood_sugar, resting_ecg, max_heart_rate, exercise_induced_angina, oldpeak, st_slope, ca, thal
+
+Comparison results:
+              model  accuracy  precision   recall  f1_score  roc_auc
+      Random Forest  0.831522   0.838095 0.862745  0.850242 0.902917
+            XGBoost  0.853261   0.837838 0.911765  0.873239 0.890722
+Logistic Regression  0.788043   0.818182 0.794118  0.805970 0.886059
+
+Best model classification report:
+              precision    recall  f1-score   support
+
+           0       0.82      0.79      0.81        82
+           1       0.84      0.86      0.85       102
+
+    accuracy                           0.83       184
+   macro avg       0.83      0.83      0.83       184
+weighted avg       0.83      0.83      0.83       184
+
+
+Limitations:
+This evaluation uses a held-out test split from the supplied dataset. It does not establish external validity, clinical calibration, or validated myocardial infarction risk.
