@@ -2,7 +2,7 @@ from io import BytesIO
 from datetime import datetime
 from xml.sax.saxutils import escape
 
-from flask import send_file
+from flask import send_file, send_from_directory
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.pagesizes import A4
@@ -32,6 +32,18 @@ from flask_cors import CORS
 PROJECT_DIR = Path(__file__).resolve().parent
 MODEL_FILE = PROJECT_DIR / "model" / "cardio_model.pkl"
 DATA_FILE = PROJECT_DIR / "datasets" / "cardioshield_preprocessed.csv"
+FRONTEND_FILES = {
+    "assessment.html",
+    "assessment.js",
+    "dashboard.css",
+    "dashboard.html",
+    "dashboard.js",
+    "index.html",
+    "profile.html",
+    "results.html",
+    "script.js",
+    "styles.css",
+}
 
 app = Flask(__name__)
 
@@ -288,14 +300,26 @@ def explain_individual(input_df):
 
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({
-        "success": True,
-        "application": "CardioShield-AgeLess",
-        "status": "running",
-        "model": MODEL_NAME,
-        "prediction_endpoint": "/predict",
-        "message": "The prediction API is running.",
-    })
+    return send_from_directory(PROJECT_DIR, "index.html")
+
+
+@app.route("/<path:filename>", methods=["GET"])
+def frontend_asset(filename):
+    path = Path(filename)
+    is_frontend_file = filename in FRONTEND_FILES
+    is_image = (
+        path.parts[0] == "images"
+        and path.suffix.lower() in {".png", ".jpg", ".jpeg", ".svg"}
+    )
+    is_shap_chart = (
+        path.parts[:2] == ("model", "shap")
+        and path.suffix.lower() == ".png"
+    )
+
+    if not (is_frontend_file or is_image or is_shap_chart):
+        return jsonify({"success": False, "error": "Not found."}), 404
+
+    return send_from_directory(PROJECT_DIR, filename)
 
 
 @app.route("/health", methods=["GET"])
