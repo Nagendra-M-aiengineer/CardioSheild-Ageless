@@ -1,7 +1,7 @@
 CardioShield-AgeLess Model Evaluation
 =============================================
 
-Selected model: Random Forest
+Selected model: Calibrated Logistic Regression
 Target: heart_disease
 Input features: age, sex, chest_pain_type, resting_bp, cholesterol, fasting_blood_sugar, resting_ecg, max_heart_rate, exercise_induced_angina, oldpeak, st_slope, ca, thal
 

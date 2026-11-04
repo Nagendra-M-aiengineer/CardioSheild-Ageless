@@ -1125,7 +1125,14 @@ footer {
 <script>
 "use strict";
 
-const API_URL = "/predict";
+const API_URL = (function() {
+    const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" || window.location.protocol === "file:";
+    const isDifferentPort = isLocal && window.location.port !== "5000" && window.location.port !== "8080";
+    if (isDifferentPort || window.location.protocol === "file:") {
+        return "http://127.0.0.1:5000/predict";
+    }
+    return "/predict";
+})();
 const RESULT_KEY = "cardioResult";
 const ASSESSMENT_KEY = "cardioAssessment";
 const LEGACY_ASSESSMENT_KEY = "cardioShieldData";
@@ -1410,7 +1417,12 @@ function normalizePrediction(result) {
         risk_percentage: score,
         probability_percentage: score,
         risk_probability: score / 100,
-        category: "Experimental model output"
+        category: "Experimental model output",
+        prediction_id: result.prediction_id || null,
+        base_value: result.base_value || (result.individual_explanation ? result.individual_explanation.baseline_output : null),
+        shap_values: result.shap_values || (result.individual_explanation ? result.individual_explanation.shap_values : null),
+        feature_contributions: result.feature_contributions || (result.individual_explanation ? result.individual_explanation.features : null),
+        individual_explanation: result.individual_explanation || null
     };
 }
 
@@ -1785,22 +1797,31 @@ async function submitAssessment() {
         const modelInput = collectModelInput();
         const lifestyleData = collectLifestyleData();
 
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(modelInput)
-        });
+        let response;
+        try {
+            response = await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(modelInput)
+            });
+        } catch (fetchErr) {
+            throw new Error("Could not connect to Flask at " + API_URL + ". Make sure Flask is running on port 5000 (run: python server.py).");
+        }
 
         let result;
+        const contentType = response.headers.get("content-type") || "";
 
-        try {
-            result = await response.json();
-        } catch {
-            throw new Error(
-                "The server did not return valid JSON. Check your Flask backend."
-            );
+        if (contentType.includes("application/json")) {
+            try {
+                result = await response.json();
+            } catch (jsonErr) {
+                throw new Error("The server returned invalid JSON: " + jsonErr.message);
+            }
+        } else {
+            const errorText = await response.text();
+            throw new Error("Server at " + API_URL + " returned HTTP " + response.status + " (" + response.statusText + ") instead of JSON. Ensure Flask server.py is running on port 5000.");
         }
 
         // Show the actual error returned by the Flask API.

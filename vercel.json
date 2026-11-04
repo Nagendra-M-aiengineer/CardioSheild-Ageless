@@ -3,7 +3,7 @@
   "framework": "flask",
   "functions": {
     "server.py": {
-      "includeFiles": "{*.html,*.css,*.js,images/**,model/shap/*.png,model/cardio_model.pkl,datasets/cardioshield_preprocessed.csv}",
+      "includeFiles": "{*.html,*.css,*.js,images/**,model/**,datasets/**}",
       "maxDuration": 60
     }
   }

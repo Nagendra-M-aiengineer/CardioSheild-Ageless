@@ -5,7 +5,14 @@
 // CARDIOSHIELD-AGELESS ASSESSMENT
 // ============================================
 
-const API_URL = "/predict";
+const API_URL = (function() {
+    const isLocal = window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" || window.location.protocol === "file:";
+    const isDifferentPort = isLocal && window.location.port !== "5000" && window.location.port !== "8080";
+    if (isDifferentPort || window.location.protocol === "file:") {
+        return "http://127.0.0.1:5000/predict";
+    }
+    return "/predict";
+})();
 const RESULT_KEY = "cardioResult";
 const ASSESSMENT_KEY = "cardioAssessment";
 const LEGACY_ASSESSMENT_KEY = "cardioShieldData";

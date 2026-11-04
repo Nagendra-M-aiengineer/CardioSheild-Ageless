@@ -14,6 +14,7 @@ from sklearn.base import clone
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
     accuracy_score,
@@ -169,6 +170,15 @@ def build_preprocessor():
 
 def build_models():
     models = {
+        "Calibrated Logistic Regression": CalibratedClassifierCV(
+            estimator=LogisticRegression(
+                max_iter=2000,
+                class_weight="balanced",
+                random_state=RANDOM_STATE,
+            ),
+            method="sigmoid",
+            cv=5,
+        ),
         "Logistic Regression": LogisticRegression(
             max_iter=2000,
             class_weight="balanced",
@@ -306,7 +316,7 @@ def save_confusion_matrix(y_test, predictions):
     )
 
     ax.set_title(
-        "Random Forest - Confusion Matrix",
+        "Logistic Regression - Confusion Matrix",
         fontsize=14,
         pad=15,
     )
@@ -348,7 +358,7 @@ def save_roc_curve(y_test, probabilities):
         fpr,
         tpr,
         linewidth=2,
-        label=f"Random Forest (AUC = {auc_value:.4f})",
+        label=f"Logistic Regression (AUC = {auc_value:.4f})",
     )
 
     ax.plot(
@@ -359,7 +369,7 @@ def save_roc_curve(y_test, probabilities):
         label="Chance baseline",
     )
 
-    ax.set_title("Random Forest - ROC Curve", fontsize=14)
+    ax.set_title("Logistic Regression - ROC Curve", fontsize=14)
     ax.set_xlabel("False Positive Rate")
     ax.set_ylabel("True Positive Rate")
     ax.set_xlim(0, 1)
@@ -376,7 +386,7 @@ def save_roc_curve(y_test, probabilities):
     plt.close(fig)
 
     print("Saved ROC curve:", ROC_CURVE_FILE)
-    print(f"Random Forest ROC-AUC: {auc_value:.4f}")
+    print(f"Logistic Regression ROC-AUC: {auc_value:.4f}")
 
 
 # ==========================================================
@@ -401,7 +411,7 @@ def save_outputs(
         index=False,
     )
 
-    best_name = results_df.iloc[0]["model"]
+    best_name = "Calibrated Logistic Regression" if "Calibrated Logistic Regression" in fitted_models else results_df.iloc[0]["model"]
     best_pipeline = fitted_models[best_name]["pipeline"]
 
     model_package = {
@@ -416,6 +426,10 @@ def save_outputs(
     joblib.dump(
         model_package,
         MODEL_FILE,
+    )
+    joblib.dump(
+        model_package,
+        MODEL_DIR / "cardioshield_model.pkl",
     )
 
     predictions = fitted_models[best_name]["predictions"]

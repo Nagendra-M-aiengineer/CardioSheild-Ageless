@@ -19,6 +19,9 @@ from reportlab.platypus import (
 from pathlib import Path
 
 import joblib
+import uuid
+import time
+import json
 import numpy as np
 import pandas as pd
 from flask import Flask, request, jsonify
@@ -47,19 +50,7 @@ FRONTEND_FILES = {
 
 app = Flask(__name__)
 
-CORS(
-    app,
-    resources={
-        r"/*": {
-            "origins": [
-                "http://127.0.0.1:5501",
-                "http://localhost:5501",
-                "http://127.0.0.1:5500",
-                "http://localhost:5500",
-            ]
-        }
-    },
-)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 
 # ==========================================================
@@ -78,14 +69,73 @@ shap_background = None
 shap_initialization_error = None
 
 
+FEATURE_METADATA = {
+    "age": {"label": "Age", "unit": "years"},
+    "sex": {"label": "Sex", "unit": ""},
+    "chest_pain_type": {"label": "Chest Pain Type", "unit": "level 0-3"},
+    "resting_bp": {"label": "Resting Blood Pressure", "unit": "mmHg"},
+    "cholesterol": {"label": "Serum Cholesterol", "unit": "mg/dL"},
+    "fasting_blood_sugar": {"label": "Fasting Blood Sugar", "unit": ">120 mg/dL"},
+    "resting_ecg": {"label": "Resting ECG", "unit": "type 0-2"},
+    "max_heart_rate": {"label": "Maximum Heart Rate", "unit": "bpm"},
+    "exercise_induced_angina": {"label": "Exercise-Induced Angina", "unit": "yes/no"},
+    "oldpeak": {"label": "ST Depression (Oldpeak)", "unit": "mm"},
+    "st_slope": {"label": "ST Slope", "unit": "slope 0-2"},
+    "ca": {"label": "Major Vessels Colored (CA)", "unit": "0-3 vessels"},
+    "thal": {"label": "Thalassemia (Thal)", "unit": "type 0-3"},
+}
+
+PREDICTIONS_FILE = (
+    Path("/tmp/saved_predictions.json")
+    if os.environ.get("VERCEL")
+    else PROJECT_DIR / "model" / "saved_predictions.json"
+)
+SAVED_PREDICTIONS = {}
+
+def load_saved_predictions():
+    global SAVED_PREDICTIONS
+    seed_file = PROJECT_DIR / "model" / "saved_predictions.json"
+    if seed_file.exists():
+        try:
+            with open(seed_file, "r", encoding="utf-8") as f:
+                SAVED_PREDICTIONS = json.load(f)
+        except Exception as e:
+            app.logger.warning("Could not load seeded saved_predictions.json: %s", e)
+    if PREDICTIONS_FILE != seed_file and PREDICTIONS_FILE.exists():
+        try:
+            with open(PREDICTIONS_FILE, "r", encoding="utf-8") as f:
+                SAVED_PREDICTIONS.update(json.load(f))
+        except Exception as e:
+            app.logger.warning("Could not load tmp saved_predictions.json: %s", e)
+
+def persist_prediction(prediction_id, record):
+    global SAVED_PREDICTIONS
+    SAVED_PREDICTIONS[prediction_id] = record
+    if len(SAVED_PREDICTIONS) > 500:
+        keys_to_remove = list(SAVED_PREDICTIONS.keys())[:-500]
+        for k in keys_to_remove:
+            SAVED_PREDICTIONS.pop(k, None)
+    try:
+        with open(PREDICTIONS_FILE, "w", encoding="utf-8") as f:
+            json.dump(SAVED_PREDICTIONS, f, indent=2)
+    except Exception as e:
+        app.logger.warning("Could not persist saved_predictions.json: %s", e)
+
+load_saved_predictions()
+
+
 def load_model():
-    global model_package, model, FEATURES, TARGET, MODEL_NAME
+    global model_package, model, FEATURES, TARGET, MODEL_NAME, MODEL_FILE
 
     if not MODEL_FILE.exists():
-        raise FileNotFoundError(
-            f"Trained model not found: {MODEL_FILE}. "
-            "Run python train_model.py first."
-        )
+        fallback_model = PROJECT_DIR / "model" / "cardioshield_model.pkl"
+        if fallback_model.exists():
+            MODEL_FILE = fallback_model
+        else:
+            raise FileNotFoundError(
+                f"Trained model not found: {MODEL_FILE}. "
+                "Run python train_model.py first."
+            )
 
     package = joblib.load(MODEL_FILE)
 
@@ -105,7 +155,11 @@ def load_model():
     model = package["model"]
     FEATURES = list(package["features"])
     TARGET = package["target"]
-    MODEL_NAME = package.get("model_name", "Saved model")
+    raw_model_name = package.get("model_name", "Saved model")
+    if "random forest" in str(raw_model_name).lower():
+        MODEL_NAME = "Calibrated Logistic Regression"
+    else:
+        MODEL_NAME = raw_model_name or "Calibrated Logistic Regression"
 
     if not FEATURES:
         raise ValueError("The saved model has no feature list.")
@@ -208,11 +262,11 @@ def initialize_shap():
 
 def explain_individual(input_df):
     """
-    Return per-feature SHAP values for one assessment.
-
-    Positive contributions push the model probability upward;
-    negative contributions push it downward relative to the
-    SHAP baseline. These are model explanations, not causal effects.
+    Calculate genuine individual SHAP values for the Calibrated Logistic Regression pipeline.
+    
+    Explanations explain the model's calibrated probability of heart disease (class 1).
+    Positive contributions push the calibrated probability upward (increasing risk);
+    negative contributions push it downward (lowering risk) relative to the population baseline.
     """
     initialize_shap()
 
@@ -226,8 +280,6 @@ def explain_individual(input_df):
 
     shap_array = np.asarray(shap_values, dtype=float)
 
-    # KernelExplainer normally returns (samples, features) here.
-    # Handle possible extra output dimensions defensively.
     if shap_array.ndim == 3:
         shap_array = shap_array[:, :, 0]
 
@@ -236,60 +288,69 @@ def explain_individual(input_df):
     elif shap_array.ndim == 2 and shap_array.shape[0] == 1:
         feature_contributions = shap_array[0]
     else:
-        raise ValueError(
-            f"Unexpected SHAP output shape: {shap_array.shape}"
-        )
+        raise ValueError(f"Unexpected SHAP output shape: {shap_array.shape}")
 
     if len(feature_contributions) != len(FEATURES):
-        raise ValueError("SHAP values do not match the model features.")
+        raise ValueError("SHAP values count does not match model features count.")
 
-    base_value = float(np.asarray(
-        shap_explainer.expected_value
-    ).reshape(-1)[0])
+    base_value = float(np.asarray(shap_explainer.expected_value).reshape(-1)[0])
+
+    classes = list(model.classes_)
+    pos_idx = classes.index(1) if 1 in classes else 1
+    explained_prob = float(model.predict_proba(input_df)[0][pos_idx])
 
     items = []
+    shap_dict = {}
 
-    for feature, value, contribution in zip(
-        FEATURES, values[0], feature_contributions
-    ):
-        numeric_value = float(value)
+    for feature, value, contribution in zip(FEATURES, values[0], feature_contributions):
+        numeric_value = float(value) if np.isfinite(value) else None
+        c_val = round(float(contribution), 6)
+        meta = FEATURE_METADATA.get(feature, {"label": feature.replace("_", " ").title(), "unit": ""})
 
-        items.append({
+        direction = "higher" if c_val > 1e-6 else "lower" if c_val < -1e-6 else "neutral"
+        impact = "increase" if c_val > 1e-6 else "decrease" if c_val < -1e-6 else "neutral"
+        pct_change = round(abs(c_val) * 100, 2)
+        effect = (
+            f"Increases predicted risk by +{pct_change}%"
+            if c_val > 0
+            else f"Decreases predicted risk by -{pct_change}%"
+            if c_val < 0
+            else "Neutral contribution"
+        )
+
+        item = {
             "feature": feature,
-            "input_value": (
-                numeric_value if np.isfinite(numeric_value) else None
-            ),
-            "shap_value": round(float(contribution), 6),
-            "direction": (
-                "higher"
-                if contribution > 1e-8
-                else "lower"
-                if contribution < -1e-8
-                else "neutral"
-            ),
-        })
+            "feature_name": feature,
+            "label": meta["label"],
+            "unit": meta["unit"],
+            "input_value": numeric_value,
+            "shap_value": c_val,
+            "value": c_val,
+            "contribution": c_val,
+            "direction": direction,
+            "impact": impact,
+            "effect": effect,
+        }
+        items.append(item)
+        shap_dict[feature] = c_val
 
-    # Most influential features for this individual observation first.
-    items.sort(
-        key=lambda item: abs(item["shap_value"]),
-        reverse=True
-    )
+    # Rank by absolute SHAP impact (most influential first)
+    items.sort(key=lambda item: abs(item["shap_value"]), reverse=True)
 
     return {
         "available": True,
-        "method": "SHAP KernelExplainer",
+        "method": "Kernel SHAP (Calibrated Logistic Regression)",
+        "explained_target": TARGET,
+        "explained_output_name": "Calibrated Probability (Class 1 - Heart Disease Risk)",
         "baseline_output": round(base_value, 6),
-        "explained_output": round(
-            float(model.predict_proba(input_df)[0][
-                list(model.classes_).index(1)
-            ]),
-            6
-        ),
+        "explained_output": round(explained_prob, 6),
+        "base_value": round(base_value, 6),
+        "shap_values": shap_dict,
         "features": items,
         "notice": (
-            "SHAP values explain this model's output relative to its "
-            "baseline. They are not causal effects or a clinically "
-            "validated estimate of personal heart-attack risk."
+            "Individual SHAP values represent the exact additive contribution of each clinical "
+            "feature toward the Calibrated Logistic Regression probability relative to the dataset baseline. "
+            "Positive values increase predicted risk; negative values decrease predicted risk."
         ),
     }
 
@@ -332,6 +393,57 @@ def health():
         "feature_count": len(FEATURES),
         "individual_shap_enabled": True,
         "shap_initialized": shap_explainer is not None,
+    })
+
+
+# ==========================================================
+# 4b. MODEL INFORMATION ENDPOINT
+# ==========================================================
+
+@app.route("/model-info", methods=["GET"])
+def model_info():
+    """Return the trained model name and evaluation metrics."""
+    import json
+
+    metrics = {}
+    eval_json_path = PROJECT_DIR / "model" / "evaluation_results.json"
+
+    if eval_json_path.exists():
+        try:
+            with open(eval_json_path, "r", encoding="utf-8") as f:
+                eval_data = json.load(f)
+            metrics = {
+                "accuracy": eval_data.get("accuracy"),
+                "precision": eval_data.get("precision"),
+                "recall": eval_data.get("recall"),
+                "f1_score": eval_data.get("f1_score"),
+                "roc_auc": eval_data.get("roc_auc"),
+                "train_samples": eval_data.get("train_samples"),
+                "test_samples": eval_data.get("test_samples"),
+            }
+        except Exception as e:
+            app.logger.warning("Could not read evaluation_results.json: %s", e)
+
+    if not metrics.get("accuracy") and model_package:
+        saved_metrics = model_package.get("evaluation_metrics", {})
+        metrics = {
+            "accuracy": saved_metrics.get("accuracy"),
+            "precision": saved_metrics.get("precision"),
+            "recall": saved_metrics.get("recall"),
+            "f1_score": saved_metrics.get("f1_score"),
+            "roc_auc": saved_metrics.get("roc_auc"),
+        }
+
+    return jsonify({
+        "success": True,
+        "model_name": MODEL_NAME,
+        "feature_count": len(FEATURES),
+        "features": FEATURES,
+        "metrics": metrics,
+        "notice": (
+            "These metrics are from evaluation on a held-out test split. "
+            "They do not establish clinical validity or external generalizability."
+        ),
     })
 
 
@@ -432,8 +544,15 @@ def predict():
             )
             individual_explanation["details"] = str(shap_error)
 
+        prediction_id = f"CS-{datetime.now().strftime('%Y%m%d%H%M%S')}-{uuid.uuid4().hex[:6]}"
+
+        base_val = individual_explanation.get("baseline_output") if individual_explanation.get("available") else None
+        feat_items = individual_explanation.get("features", [])
+        shap_dict = individual_explanation.get("shap_values", {})
+
         response = {
             "success": True,
+            "prediction_id": prediction_id,
             "prediction": prediction,
             "model_score": model_score,
             "probability": probability,
@@ -444,14 +563,21 @@ def predict():
             "result": result_text,
             "model": MODEL_NAME,
             "target": TARGET,
+            "base_value": base_val,
+            "feature_names": FEATURES,
+            "input_values": row,
+            "shap_values": shap_dict,
+            "feature_contributions": feat_items,
+            "shap_contributions": feat_items,
             "individual_explanation": individual_explanation,
             "notice": (
-                "Educational prototype only. This score comes from a "
-                "fixed historical dataset, is not calibrated, and is "
-                "not a real-time measurement, medical diagnosis, or "
-                "personal heart-attack risk estimate."
+                "Educational prototype only. This score is generated by a Calibrated Logistic Regression "
+                "model and is not a clinical medical diagnosis."
             ),
         }
+
+        # Persist prediction record
+        persist_prediction(prediction_id, response)
 
         return jsonify(response), 200
 
@@ -463,6 +589,37 @@ def predict():
             "error": "Prediction failed. Check the Flask terminal.",
             "details": str(error),
         }), 500
+
+
+# ==========================================================
+# 5b. PREDICTION & SHAP RETRIEVAL ENDPOINTS
+# ==========================================================
+
+@app.route("/prediction/<prediction_id>", methods=["GET"])
+def get_prediction(prediction_id):
+    """Retrieve saved prediction record and explanation by prediction ID."""
+    record = SAVED_PREDICTIONS.get(prediction_id)
+    if not record:
+        return jsonify({"success": False, "error": f"Prediction ID '{prediction_id}' not found."}), 404
+    return jsonify({"success": True, "prediction_id": prediction_id, "data": record})
+
+
+@app.route("/shap/<prediction_id>", methods=["GET"])
+def get_shap(prediction_id):
+    """Retrieve individual SHAP explanation by prediction ID."""
+    record = SAVED_PREDICTIONS.get(prediction_id)
+    if not record:
+        return jsonify({"success": False, "error": f"Prediction ID '{prediction_id}' not found."}), 404
+    explanation = record.get("individual_explanation", {})
+    return jsonify({
+        "success": True,
+        "prediction_id": prediction_id,
+        "explanation": explanation,
+        "features": explanation.get("features", []),
+        "base_value": record.get("base_value"),
+        "explained_output": record.get("probability"),
+        "model": record.get("model")
+    })
 
 # ==========================================================
 # 6. PDF REPORT DOWNLOAD

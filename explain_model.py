@@ -134,7 +134,7 @@ def main():
     # ======================================================
 
     # KernelExplainer works with the full sklearn pipeline,
-    # including imputation, scaling, and Random Forest.
+    # including imputation, scaling, and Calibrated Logistic Regression.
     def predict_class_1(data):
         if isinstance(data, pd.DataFrame):
             input_df = data[FEATURES]
