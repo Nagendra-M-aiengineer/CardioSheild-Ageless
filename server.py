@@ -87,6 +87,44 @@ FEATURE_METADATA = {
     "thal": {"label": "Thalassemia (Thal)", "unit": "type 0-3"},
 }
 
+FEATURE_ALIASES = {
+    "cp": "chest_pain_type",
+    "chest_pain": "chest_pain_type",
+    "trestbps": "resting_bp",
+    "blood_pressure": "resting_bp",
+    "bp": "resting_bp",
+    "chol": "cholesterol",
+    "fbs": "fasting_blood_sugar",
+    "blood_sugar": "fasting_blood_sugar",
+    "restecg": "resting_ecg",
+    "ecg": "resting_ecg",
+    "thalach": "max_heart_rate",
+    "max_hr": "max_heart_rate",
+    "exang": "exercise_induced_angina",
+    "angina": "exercise_induced_angina",
+    "slope": "st_slope",
+}
+
+def sanitize_json_value(val):
+    """
+    Recursively sanitize objects so they are strictly RFC 8259 JSON compliant.
+    Converts NaN, Infinity, -Infinity, and non-finite floats to None (JSON null).
+    Converts numpy numeric types to native Python types.
+    """
+    if val is None:
+        return None
+    if isinstance(val, (np.floating, float)):
+        return float(val) if np.isfinite(val) else None
+    if isinstance(val, (np.integer, int)):
+        return int(val)
+    if isinstance(val, (np.bool_, bool)):
+        return bool(val)
+    if isinstance(val, dict):
+        return {str(k): sanitize_json_value(v) for k, v in val.items()}
+    if isinstance(val, (list, tuple, np.ndarray)):
+        return [sanitize_json_value(v) for v in val]
+    return val
+
 PREDICTIONS_FILE = (
     Path("/tmp/saved_predictions.json")
     if os.environ.get("VERCEL")
@@ -339,14 +377,14 @@ def explain_individual(input_df):
     # Rank by absolute SHAP impact (most influential first)
     items.sort(key=lambda item: abs(item["shap_value"]), reverse=True)
 
-    return {
+    return sanitize_json_value({
         "available": True,
         "method": "Kernel SHAP (Calibrated Logistic Regression)",
         "explained_target": TARGET,
         "explained_output_name": "Calibrated Probability (Class 1 - Heart Disease Risk)",
-        "baseline_output": round(base_value, 6),
-        "explained_output": round(explained_prob, 6),
-        "base_value": round(base_value, 6),
+        "baseline_output": round(base_value, 6) if np.isfinite(base_value) else 0.5,
+        "explained_output": round(explained_prob, 6) if np.isfinite(explained_prob) else 0.5,
+        "base_value": round(base_value, 6) if np.isfinite(base_value) else 0.5,
         "shap_values": shap_dict,
         "features": items,
         "notice": (
@@ -354,7 +392,7 @@ def explain_individual(input_df):
             "feature toward the Calibrated Logistic Regression probability relative to the dataset baseline. "
             "Positive values increase predicted risk; negative values decrease predicted risk."
         ),
-    }
+    })
 
 
 # ==========================================================
@@ -476,6 +514,15 @@ def predict():
         for feature in FEATURES:
             value = data.get(feature)
 
+            # Check known aliases if canonical feature name is not present
+            if value is None or value == "":
+                for alias, canonical in FEATURE_ALIASES.items():
+                    if canonical == feature and alias in data:
+                        candidate = data.get(alias)
+                        if candidate is not None and candidate != "":
+                            value = candidate
+                            break
+
             if value is None or value == "":
                 row[feature] = np.nan
                 continue
@@ -552,6 +599,11 @@ def predict():
         feat_items = individual_explanation.get("features", [])
         shap_dict = individual_explanation.get("shap_values", {})
 
+        clean_input_values = {
+            f: (float(val) if (val is not None and np.isfinite(val)) else None)
+            for f, val in row.items()
+        }
+
         response = {
             "success": True,
             "prediction_id": prediction_id,
@@ -567,7 +619,7 @@ def predict():
             "target": TARGET,
             "base_value": base_val,
             "feature_names": FEATURES,
-            "input_values": row,
+            "input_values": clean_input_values,
             "shap_values": shap_dict,
             "feature_contributions": feat_items,
             "shap_contributions": feat_items,
@@ -577,6 +629,9 @@ def predict():
                 "model and is not a clinical medical diagnosis."
             ),
         }
+
+        # Sanitize entire response so non-finite floats (NaN/Inf) are converted to None (JSON null)
+        response = sanitize_json_value(response)
 
         # Persist prediction record
         persist_prediction(prediction_id, response)
@@ -603,7 +658,7 @@ def get_prediction(prediction_id):
     record = SAVED_PREDICTIONS.get(prediction_id)
     if not record:
         return jsonify({"success": False, "error": f"Prediction ID '{prediction_id}' not found."}), 404
-    return jsonify({"success": True, "prediction_id": prediction_id, "data": record})
+    return jsonify(sanitize_json_value({"success": True, "prediction_id": prediction_id, "data": record}))
 
 
 @app.route("/shap/<prediction_id>", methods=["GET"])
@@ -613,7 +668,7 @@ def get_shap(prediction_id):
     if not record:
         return jsonify({"success": False, "error": f"Prediction ID '{prediction_id}' not found."}), 404
     explanation = record.get("individual_explanation", {})
-    return jsonify({
+    return jsonify(sanitize_json_value({
         "success": True,
         "prediction_id": prediction_id,
         "explanation": explanation,
@@ -621,7 +676,9 @@ def get_shap(prediction_id):
         "base_value": record.get("base_value"),
         "explained_output": record.get("probability"),
         "model": record.get("model")
-    })
+    }))
+
+
 
 # ==========================================================
 # 6. PDF REPORT DOWNLOAD
